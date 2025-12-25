@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雲端旅遊帳本</title>
+    <title>出去廢</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,7 +42,7 @@
     <div v-if="isLoading" class="loading-bar"></div>
 
     <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">☁️ 雲端旅遊帳本</h1>
+        <h1 class="text-xl font-bold tracking-wide">☁️出去廢</h1>
         <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100 active:scale-95">↻ 同步</button>
     </header>
 
@@ -177,7 +177,7 @@
             const isLoading = ref(false);
             
             // 資料狀態
-            const people = ref(JSON.parse(localStorage.getItem('travel_people')) || ['我', '旅伴']);
+            const people = ref(JSON.parse(localStorage.getItem('travel_people')) || ['我', 'B']);
             const itinerary = ref([]);
             const expenses = ref([]);
 
@@ -306,5 +306,6 @@
 </script>
 </body>
 </html>
+
 
 
