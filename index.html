@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雲端旅遊帳本</title>
+    <title>出發囉</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -22,7 +22,7 @@
     <div v-if="isLoading" class="loading-bar"></div>
 
     <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-bold">☁️ 雲端旅遊帳本</h1>
+        <h1 class="text-xl font-bold">☁️ 出發囉</h1>
         <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100">↻ 同步</button>
     </header>
 
@@ -102,7 +102,7 @@
         </div>
 
         <div v-if="currentTab === 'settings'" class="card p-4">
-            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理 (已雲端同步)</h3>
+            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理 </h3>
             <div class="flex gap-2 mb-6">
                 <input v-model="newPerson" type="text" placeholder="名字" class="flex-1 bg-gray-100 p-2 rounded">
                 <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded">新增</button>
@@ -128,7 +128,7 @@
     createApp({
         setup() {
             // ★★★ 請記得換成您的 API 網址 ★★★
-            const API_URL = 'https://script.google.com/macros/s/您的網址亂碼/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbwYGSTC9hyy3hDfaF7XwfoIH6G_q-bY0UoTKIshQpdYjmbLq5wV3jHlYI_UDAyKPyYo/exec';
 
             const currentTab = ref('itinerary');
             const isLoading = ref(false);
@@ -275,3 +275,4 @@
 </script>
 </body>
 </html>
+
