@@ -3,119 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>出去廢</title>
-    
+    <title>雲端旅遊帳本</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-    
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
-
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #f0f2f5; 
-            -webkit-user-select: none; user-select: none;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; user-select: none; padding-bottom: env(safe-area-inset-bottom); }
         .card { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
-        input, select { -webkit-user-select: text; user-select: text; }
-        .checkbox-wrapper input:checked + div {
-            background-color: #dbeafe; color: #2563eb; border-color: #2563eb;
-        }
-        .loading-bar {
-            position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #2563eb; z-index: 9999;
-            animation: loading 1s infinite linear;
-        }
+        .checkbox-wrapper input:checked + div { background-color: #dbeafe; color: #2563eb; border-color: #2563eb; }
+        .loading-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #2563eb; z-index: 9999; animation: loading 1s infinite linear; }
         @keyframes loading { 0% { width: 0%; left: 0; } 50% { width: 50%; left: 25%; } 100% { width: 100%; left: 100%; } }
     </style>
 </head>
 <body>
 
 <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col">
-    
     <div v-if="isLoading" class="loading-bar"></div>
 
     <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">☁️出去廢</h1>
-        <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100 active:scale-95">↻ 同步</button>
+        <h1 class="text-xl font-bold">☁️ 雲端旅遊帳本</h1>
+        <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100">↻ 同步</button>
     </header>
 
     <main class="flex-1 p-4 pb-24 overflow-y-auto">
-        
         <div v-if="currentTab === 'itinerary'" class="space-y-4">
-            <div class="card p-4">
-                <div class="flex gap-2">
-                    <input v-model="newPlace" @keyup.enter="addPlace" type="text" placeholder="輸入地點" class="flex-1 border-0 bg-gray-100 p-3 rounded-lg outline-none text-lg">
-                    <button @click="addPlace" class="bg-blue-600 text-white w-12 rounded-lg text-2xl shadow active:scale-95 transition" :disabled="isLoading">+</button>
-                </div>
+            <div class="card p-4 flex gap-2">
+                <input v-model="newPlace" type="text" placeholder="輸入地點" class="flex-1 bg-gray-100 p-3 rounded-lg outline-none">
+                <button @click="addPlace" class="bg-blue-600 text-white w-12 rounded-lg text-2xl">+</button>
             </div>
-
             <div class="space-y-3">
-                <div v-for="(place, index) in itinerary" :key="place.id" class="card p-4 flex justify-between items-center active:scale-[0.99] transition">
+                <div v-for="(place, index) in itinerary" :key="place.id" class="card p-4 flex justify-between items-center">
                     <div class="flex-1" @click="openMap(place.name)">
-                        <div class="font-bold text-gray-800 text-lg">{{ place.name }}</div>
-                        <div class="text-xs text-blue-500 mt-1">🗺️ 導航</div>
+                        <div class="font-bold text-lg">{{ place.name }}</div>
+                        <div class="text-xs text-blue-500">🗺️ 導航</div>
                     </div>
-                    <button @click.stop="removePlace(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl" :disabled="isLoading">×</button>
+                    <button @click.stop="removePlace(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl">×</button>
                 </div>
-                <div v-if="itinerary.length === 0 && !isLoading" class="text-center text-gray-400 mt-10">尚無行程</div>
+                <div v-if="itinerary.length === 0" class="text-center text-gray-400 mt-10">尚無行程</div>
             </div>
         </div>
 
         <div v-if="currentTab === 'money'" class="space-y-4">
-            
             <div class="card p-4 bg-gradient-to-r from-gray-800 to-gray-700 text-white shadow-lg">
                 <div class="flex justify-between items-end mb-4">
                     <span class="text-gray-300 text-sm">總支出</span>
                     <span class="text-2xl font-bold">${{ totalExpense }}</span>
                 </div>
                 <div class="space-y-2 border-t border-gray-600 pt-3">
-                    <div v-for="result in balanceSheet" :key="result.name" class="flex justify-between text-sm items-center">
-                        <span class="text-gray-200">{{ result.name }}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-400" v-if="result.balance !== 0">{{ result.balance > 0 ? '應收' : '應付' }}</span>
-                            <span :class="result.balance >= 0 ? 'text-green-300' : 'text-red-300'" class="font-mono font-bold text-base">
-                                ${{ Math.abs(result.balance).toFixed(0) }}
-                            </span>
-                        </div>
+                    <div v-for="result in balanceSheet" :key="result.name" class="flex justify-between text-sm">
+                        <span>{{ result.name }}</span>
+                        <span :class="result.balance >= 0 ? 'text-green-300' : 'text-red-300'" class="font-mono font-bold">
+                            {{ result.balance >= 0 ? '+' : '' }}{{ Math.abs(result.balance).toFixed(0) }}
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="card p-4 border border-blue-100">
                 <div class="grid grid-cols-3 gap-2 mb-3">
-                    <input v-model="newExpense.title" type="text" placeholder="項目" class="col-span-2 bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200 outline-none">
-                    <input v-model.number="newExpense.amount" type="number" placeholder="$" class="bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200 outline-none">
+                    <input v-model="newExpense.title" placeholder="項目" class="col-span-2 bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200">
+                    <input v-model.number="newExpense.amount" type="number" placeholder="$" class="bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200">
                 </div>
-                
                 <div class="mb-3 flex gap-2 items-center">
                     <span class="text-xs text-gray-500 w-12">付款人</span>
                     <select v-model="newExpense.payer" class="flex-1 bg-gray-50 p-2 rounded border-0 ring-1 ring-gray-200">
-                        <option v-for="p in people" :value="p">{{ p }}</option>
+                        <option v-for="p in people" :value="p.name">{{ p.name }}</option>
                     </select>
                 </div>
-
                 <div class="mb-4">
-                    <span class="text-xs text-gray-500 block mb-1">分攤給 (點擊切換)</span>
+                    <span class="text-xs text-gray-500 block mb-1">分攤給</span>
                     <div class="flex flex-wrap gap-2">
-                        <label v-for="p in people" :key="p" class="checkbox-wrapper cursor-pointer relative">
-                            <input type="checkbox" :value="p" v-model="newExpense.involved" class="absolute opacity-0 w-0 h-0">
+                        <label v-for="p in people" :key="p.id" class="checkbox-wrapper cursor-pointer relative">
+                            <input type="checkbox" :value="p.name" v-model="newExpense.involved" class="absolute opacity-0 w-0 h-0">
                             <div class="px-3 py-1 rounded-full border border-gray-200 text-sm text-gray-500 bg-white transition select-none">
-                                {{ p }}
+                                {{ p.name }}
                             </div>
                         </label>
                     </div>
                 </div>
-
-                <button @click="addExpense" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition disabled:opacity-50" :disabled="!newExpense.title || !newExpense.amount || isLoading">
-                    記帳
-                </button>
+                <button @click="addExpense" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold" :disabled="isLoading">記帳</button>
             </div>
 
             <div class="space-y-2 pb-10">
@@ -127,82 +94,82 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-800 text-lg">${{ exp.amount }}</span>
-                        <button @click="removeExpense(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl" :disabled="isLoading">×</button>
+                        <span class="font-bold text-lg">${{ exp.amount }}</span>
+                        <button @click="removeExpense(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl">×</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div v-if="currentTab === 'settings'" class="card p-4">
-            <h3 class="font-bold mb-4 text-gray-700">👥 成員設定 (本機)</h3>
+            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理 (已雲端同步)</h3>
             <div class="flex gap-2 mb-6">
                 <input v-model="newPerson" type="text" placeholder="名字" class="flex-1 bg-gray-100 p-2 rounded">
                 <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded">新增</button>
             </div>
             <div class="space-y-2">
-                <div v-for="(p, index) in people" :key="p" class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
-                    <span class="font-medium">{{ p }}</span>
-                    <button @click="removePerson(index)" class="text-red-400 text-sm" v-if="people.length > 1">移除</button>
+                <div v-for="(p, index) in people" :key="p.id" class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
+                    <span class="font-medium">{{ p.name }}</span>
+                    <button @click="removePerson(index)" class="text-red-400 text-sm">移除</button>
                 </div>
             </div>
-            <p class="text-xs text-gray-400 mt-4 text-center">注意：成員名單目前只存在您的手機</p>
         </div>
-
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around pb-safe pt-2 pb-2 z-50">
-        <button @click="currentTab = 'itinerary'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'itinerary' ? 'text-blue-600' : 'text-gray-400'">
-            <span class="text-xl">📍</span><span class="text-xs mt-1">行程</span>
-        </button>
-        <button @click="currentTab = 'money'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'money' ? 'text-green-600' : 'text-gray-400'">
-            <span class="text-xl">💰</span><span class="text-xs mt-1">分帳</span>
-        </button>
-        <button @click="currentTab = 'settings'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'settings' ? 'text-gray-600' : 'text-gray-400'">
-            <span class="text-xl">⚙️</span><span class="text-xs mt-1">設定</span>
-        </button>
+        <button @click="currentTab='itinerary'" class="flex flex-col items-center w-full" :class="currentTab==='itinerary'?'text-blue-600':'text-gray-400'"><span class="text-xl">📍</span><span class="text-xs">行程</span></button>
+        <button @click="currentTab='money'" class="flex flex-col items-center w-full" :class="currentTab==='money'?'text-green-600':'text-gray-400'"><span class="text-xl">💰</span><span class="text-xs">分帳</span></button>
+        <button @click="currentTab='settings'" class="flex flex-col items-center w-full" :class="currentTab==='settings'?'text-gray-600':'text-gray-400'"><span class="text-xl">⚙️</span><span class="text-xs">設定</span></button>
     </nav>
-
 </div>
 
 <script>
-    const { createApp, ref, computed, onMounted, watch } = Vue;
-
+    const { createApp, ref, computed, onMounted } = Vue;
     createApp({
         setup() {
-            // ★★★ 請替換成您的 Google Apps Script 網址 ★★★
-            const API_URL = 'https://script.google.com/macros/s/AKfycbwYGSTC9hyy3hDfaF7XwfoIH6G_q-bY0UoTKIshQpdYjmbLq5wV3jHlYI_UDAyKPyYo/exec';
+            // ★★★ 請記得換成您的 API 網址 ★★★
+            const API_URL = 'https://script.google.com/macros/s/您的網址亂碼/exec';
 
             const currentTab = ref('itinerary');
             const isLoading = ref(false);
-            
-            // 資料狀態
-            const people = ref(JSON.parse(localStorage.getItem('travel_people')) || ['A', 'B']);
+            const people = ref([]); // 這裡現在預設是空的，會從雲端抓
             const itinerary = ref([]);
             const expenses = ref([]);
 
             const newPlace = ref('');
             const newPerson = ref('');
-            const newExpense = ref({ title: '', amount: '', payer: people.value[0], involved: [...people.value] });
+            const newExpense = ref({ title: '', amount: '', payer: '', involved: [] });
 
-            watch(people, (val) => localStorage.setItem('travel_people', JSON.stringify(val)), { deep: true });
-
-            // 產生唯一 ID (時間戳 + 隨機數)
             const generateId = () => Date.now() + '_' + Math.floor(Math.random() * 1000);
 
-            // --- API 功能 ---
             const fetchData = async () => {
-                if(!API_URL.includes('google')) return alert('請先在程式碼中設定 API 網址');
+                if(!API_URL.includes('google')) return alert('請設定 API 網址');
                 isLoading.value = true;
                 try {
-                    const [resItin, resExp] = await Promise.all([
+                    // 同步抓取 行程、帳目、成員
+                    const [resItin, resExp, resPpl] = await Promise.all([
                         fetch(`${API_URL}?type=itinerary`),
-                        fetch(`${API_URL}?type=expenses`)
+                        fetch(`${API_URL}?type=expenses`),
+                        fetch(`${API_URL}?type=people`)
                     ]);
                     itinerary.value = await resItin.json();
                     expenses.value = await resExp.json();
+                    const pplData = await resPpl.json();
+                    
+                    // 如果雲端完全沒人，預設加一個「我」
+                    if (pplData.length === 0) {
+                        people.value = [{id: 'default', name: '我'}]; 
+                    } else {
+                        people.value = pplData;
+                    }
+
+                    // 重置記帳表單的預設值
+                    if(people.value.length > 0) {
+                        newExpense.value.payer = people.value[0].name;
+                        newExpense.value.involved = people.value.map(p => p.name);
+                    }
                 } catch (e) {
-                    alert('連線失敗'); console.error(e);
+                    console.error(e);
                 } finally {
                     isLoading.value = false;
                 }
@@ -210,90 +177,92 @@
 
             onMounted(() => fetchData());
 
-            // --- 行程邏輯 ---
+            // --- API 傳送 helper ---
+            const sendToApi = async (action, type, dataOrId) => {
+                const body = { action, type };
+                if (action === 'add') body.data = dataOrId;
+                else body.id = dataOrId;
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
+            };
+
+            // --- 成員管理 (改為雲端) ---
+            const addPerson = async () => {
+                if (!newPerson.value.trim()) return;
+                const uniqueId = generateId();
+                const name = newPerson.value;
+                people.value.push({ id: uniqueId, name: name }); // 本地更新
+                newExpense.value.involved.push(name); // 自動勾選分帳
+                newPerson.value = '';
+                await sendToApi('add', 'people', { id: uniqueId, name: name });
+            };
+
+            const removePerson = async (index) => {
+                const item = people.value[index];
+                if (!item.id || confirm('確定移除？') === false) return;
+                people.value.splice(index, 1);
+                await sendToApi('del', 'people', item.id);
+            };
+
+            // --- 行程 ---
             const addPlace = async () => {
                 if (!newPlace.value.trim()) return;
                 const uniqueId = generateId();
-                const nameToSend = newPlace.value;
-                
-                // 本地先更新
-                itinerary.value.push({ id: uniqueId, name: nameToSend });
+                itinerary.value.push({ id: uniqueId, name: newPlace.value });
+                const val = newPlace.value;
                 newPlace.value = '';
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'add', type: 'itinerary', data: { id: uniqueId, name: nameToSend } })
-                });
+                await sendToApi('add', 'itinerary', { id: uniqueId, name: val });
             };
-
             const removePlace = async (index) => {
                 const item = itinerary.value[index];
-                if (!item.id) return;
                 itinerary.value.splice(index, 1);
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'del', type: 'itinerary', id: item.id })
-                });
+                await sendToApi('del', 'itinerary', item.id);
             };
 
-            const openMap = (name) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`, '_blank');
-
-            // --- 記帳邏輯 ---
+            // --- 帳目 ---
             const addExpense = async () => {
                 if (!newExpense.value.title || !newExpense.value.amount) return;
                 const uniqueId = generateId();
-                const dataObj = { 
-                    id: uniqueId, 
-                    title: newExpense.value.title, 
-                    amount: newExpense.value.amount, 
-                    payer: newExpense.value.payer, 
-                    involved: [...newExpense.value.involved] 
-                };
-
+                const dataObj = { id: uniqueId, ...newExpense.value, involved: [...newExpense.value.involved] };
                 expenses.value.unshift(dataObj);
-                
-                // 傳送資料時，將 involved 陣列轉字串
-                const sendObj = { ...dataObj, involved: dataObj.involved.join(',') };
-                newExpense.value = { title: '', amount: '', payer: people.value[0], involved: [...people.value] };
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'add', type: 'expenses', data: sendObj })
-                });
+                const apiObj = { ...dataObj, involved: dataObj.involved }; 
+                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name || '', involved: people.value.map(p=>p.name) };
+                await sendToApi('add', 'expenses', apiObj);
             };
-
             const removeExpense = async (index) => {
                 const item = expenses.value[index];
-                if (!item.id) return;
                 expenses.value.splice(index, 1);
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'del', type: 'expenses', id: item.id })
-                });
+                await sendToApi('del', 'expenses', item.id);
             };
 
-            // --- 計算邏輯 ---
+            // --- 計算 ---
             const totalExpense = computed(() => expenses.value.reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
-            
             const balanceSheet = computed(() => {
                 if (people.value.length === 0) return [];
                 let balances = {};
-                people.value.forEach(p => balances[p] = 0);
+                // 初始化
+                people.value.forEach(p => balances[p.name] = 0);
                 
                 expenses.value.forEach(exp => {
                     const amount = Number(exp.amount) || 0;
                     const payer = exp.payer;
-                    const involved = (exp.involved && exp.involved.length > 0) ? exp.involved : people.value;
+                    // 防呆：如果雲端資料的付款人不在現在名單內 (例如被刪了)，就略過不計
+                    if (balances[payer] === undefined) return;
+
+                    balances[payer] += amount;
                     
-                    if (balances[payer] !== undefined) balances[payer] += amount;
-                    const splitAmount = amount / involved.length;
-                    involved.forEach(person => { if (balances[person] !== undefined) balances[person] -= splitAmount; });
+                    // 計算分攤
+                    const involvedList = (exp.involved && exp.involved.length > 0) ? exp.involved : people.value.map(p=>p.name);
+                    const validInvolved = involvedList.filter(name => balances[name] !== undefined);
+                    
+                    if (validInvolved.length > 0) {
+                        const splitAmount = amount / validInvolved.length;
+                        validInvolved.forEach(name => balances[name] -= splitAmount);
+                    }
                 });
-                return people.value.map(p => ({ name: p, balance: balances[p] }));
+                return Object.keys(balances).map(name => ({ name: name, balance: balances[name] }));
             });
 
-            const addPerson = () => { people.value.push(newPerson.value); newPerson.value = ''; };
-            const removePerson = (index) => people.value.splice(index, 1);
+            const openMap = (name) => window.open(`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(name)}`, '_blank');
             const formatInvolved = (list) => Array.isArray(list) ? list.join(', ') : list;
 
             return {
@@ -306,7 +275,3 @@
 </script>
 </body>
 </html>
-
-
-
-
