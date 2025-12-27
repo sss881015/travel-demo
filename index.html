@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>出發囉</title>
+    <title>雲端旅遊帳本</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -12,6 +12,8 @@
         body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; user-select: none; padding-bottom: env(safe-area-inset-bottom); }
         .card { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .checkbox-wrapper input:checked + div { background-color: #dbeafe; color: #2563eb; border-color: #2563eb; }
+        .day-tab-active { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .day-tab-inactive { background-color: white; color: #6b7280; border-color: #e5e7eb; }
         .loading-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #2563eb; z-index: 9999; animation: loading 1s infinite linear; }
         @keyframes loading { 0% { width: 0%; left: 0; } 50% { width: 50%; left: 25%; } 100% { width: 100%; left: 100%; } }
     </style>
@@ -22,25 +24,37 @@
     <div v-if="isLoading" class="loading-bar"></div>
 
     <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-bold">☁️ 出發囉</h1>
-        <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100">↻ 同步</button>
+        <h1 class="text-xl font-bold">☁️ 雲端旅遊帳本</h1>
+        <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100 active:scale-95">↻ 同步</button>
     </header>
 
     <main class="flex-1 p-4 pb-24 overflow-y-auto">
+        
         <div v-if="currentTab === 'itinerary'" class="space-y-4">
-            <div class="card p-4 flex gap-2">
-                <input v-model="newPlace" type="text" placeholder="輸入地點" class="flex-1 bg-gray-100 p-3 rounded-lg outline-none">
-                <button @click="addPlace" class="bg-blue-600 text-white w-12 rounded-lg text-2xl">+</button>
+            
+            <div class="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
+                <button v-for="d in 5" :key="d" 
+                    @click="currentDay = d"
+                    class="px-4 py-2 rounded-full border text-sm font-bold whitespace-nowrap transition"
+                    :class="currentDay === d ? 'day-tab-active' : 'day-tab-inactive'">
+                    Day {{ d }}
+                </button>
             </div>
+
+            <div class="card p-4 flex gap-2 border-l-4 border-blue-500">
+                <input v-model="newPlace" type="text" :placeholder="'新增 Day ' + currentDay + ' 行程'" class="flex-1 bg-gray-100 p-3 rounded-lg outline-none">
+                <button @click="addPlace" class="bg-blue-600 text-white w-12 rounded-lg text-2xl active:scale-95">+</button>
+            </div>
+
             <div class="space-y-3">
-                <div v-for="(place, index) in itinerary" :key="place.id" class="card p-4 flex justify-between items-center">
+                <div v-for="(place, index) in filteredItinerary" :key="place.id" class="card p-4 flex justify-between items-center animate-fade-in">
                     <div class="flex-1" @click="openMap(place.name)">
-                        <div class="font-bold text-lg">{{ place.name }}</div>
-                        <div class="text-xs text-blue-500">🗺️ 導航</div>
+                        <div class="font-bold text-lg text-gray-800">{{ place.name }}</div>
+                        <div class="text-xs text-blue-500 mt-1">🗺️ 導航</div>
                     </div>
-                    <button @click.stop="removePlace(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl">×</button>
+                    <button @click.stop="removePlace(place.id)" class="text-gray-300 hover:text-red-500 px-2 text-xl">×</button>
                 </div>
-                <div v-if="itinerary.length === 0" class="text-center text-gray-400 mt-10">尚無行程</div>
+                <div v-if="filteredItinerary.length === 0" class="text-center text-gray-400 mt-10">Day {{ currentDay }} 還沒有行程</div>
             </div>
         </div>
 
@@ -102,7 +116,7 @@
         </div>
 
         <div v-if="currentTab === 'settings'" class="card p-4">
-            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理 </h3>
+            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理</h3>
             <div class="flex gap-2 mb-6">
                 <input v-model="newPerson" type="text" placeholder="名字" class="flex-1 bg-gray-100 p-2 rounded">
                 <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded">新增</button>
@@ -127,12 +141,13 @@
     const { createApp, ref, computed, onMounted } = Vue;
     createApp({
         setup() {
-            // ★★★ 請記得換成您的  網址 ★★★
+            // ★★★ 請替換成您的 API 網址 (務必是 /exec 結尾) ★★★
             const API_URL = 'https://script.google.com/macros/s/AKfycbz_JmdynmF2yJ7gvY21rEuw9nuferMeVxFCrGqgSlpKoqP-_cTzFNCa-s7gv9y97uLR/exec';
 
             const currentTab = ref('itinerary');
+            const currentDay = ref(1); // ★ 新增：目前選中的天數
             const isLoading = ref(false);
-            const people = ref([]); // 這裡現在預設是空的，會從雲端抓
+            const people = ref([]); 
             const itinerary = ref([]);
             const expenses = ref([]);
 
@@ -146,7 +161,6 @@
                 if(!API_URL.includes('google')) return alert('請設定 API 網址');
                 isLoading.value = true;
                 try {
-                    // 同步抓取 行程、帳目、成員
                     const [resItin, resExp, resPpl] = await Promise.all([
                         fetch(`${API_URL}?type=itinerary`),
                         fetch(`${API_URL}?type=expenses`),
@@ -155,78 +169,82 @@
                     itinerary.value = await resItin.json();
                     expenses.value = await resExp.json();
                     const pplData = await resPpl.json();
+                    people.value = pplData.length ? pplData : [{id: 'default', name: '我'}];
                     
-                    // 如果雲端完全沒人，預設加一個「我」
-                    if (pplData.length === 0) {
-                        people.value = [{id: 'default', name: '我'}]; 
-                    } else {
-                        people.value = pplData;
-                    }
-
-                    // 重置記帳表單的預設值
                     if(people.value.length > 0) {
                         newExpense.value.payer = people.value[0].name;
                         newExpense.value.involved = people.value.map(p => p.name);
                     }
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    isLoading.value = false;
-                }
+                } catch (e) { console.error(e); } finally { isLoading.value = false; }
             };
 
             onMounted(() => fetchData());
 
-            // --- API 傳送 helper ---
             const sendToApi = async (action, type, dataOrId) => {
                 const body = { action, type };
                 if (action === 'add') body.data = dataOrId;
                 else body.id = dataOrId;
+                // 使用 no-cors 模式避免部分瀏覽器問題，但正常設定下不需要
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
             };
 
-            // --- 成員管理 (改為雲端) ---
+            // --- 行程功能 (分天) ---
+            // 計算屬性：只回傳「當前天數」的行程
+            const filteredItinerary = computed(() => {
+                return itinerary.value.filter(item => {
+                    // 如果資料庫裡的資料沒有 day (舊資料)，預設算在 Day 1
+                    const itemDay = item.day ? parseInt(item.day) : 1;
+                    return itemDay === currentDay.value;
+                });
+            });
+
+            const addPlace = async () => {
+                if (!newPlace.value.trim()) return;
+                const uniqueId = generateId();
+                const name = newPlace.value;
+                const day = currentDay.value; // ★ 抓取當前天數
+
+                // 先更新本地畫面
+                itinerary.value.push({ id: uniqueId, name: name, day: day });
+                newPlace.value = '';
+
+                // ★ 傳送 day 欄位給後端
+                await sendToApi('add', 'itinerary', { id: uniqueId, name: name, day: day });
+            };
+
+            // 修正移除功能：因為 filteredItinerary 的 index 跟原始陣列不同，必須用 ID 刪
+            const removePlace = async (idToDelete) => {
+                // 從原始陣列中移除
+                const index = itinerary.value.findIndex(item => item.id === idToDelete);
+                if (index !== -1) {
+                    itinerary.value.splice(index, 1);
+                    await sendToApi('del', 'itinerary', idToDelete);
+                }
+            };
+
+            // --- 其他功能 (維持不變) ---
             const addPerson = async () => {
                 if (!newPerson.value.trim()) return;
                 const uniqueId = generateId();
                 const name = newPerson.value;
-                people.value.push({ id: uniqueId, name: name }); // 本地更新
-                newExpense.value.involved.push(name); // 自動勾選分帳
+                people.value.push({ id: uniqueId, name: name });
+                newExpense.value.involved.push(name);
                 newPerson.value = '';
                 await sendToApi('add', 'people', { id: uniqueId, name: name });
             };
-
             const removePerson = async (index) => {
                 const item = people.value[index];
-                if (!item.id || confirm('確定移除？') === false) return;
+                if (!item.id || !confirm('確定移除？')) return;
                 people.value.splice(index, 1);
                 await sendToApi('del', 'people', item.id);
             };
-
-            // --- 行程 ---
-            const addPlace = async () => {
-                if (!newPlace.value.trim()) return;
-                const uniqueId = generateId();
-                itinerary.value.push({ id: uniqueId, name: newPlace.value });
-                const val = newPlace.value;
-                newPlace.value = '';
-                await sendToApi('add', 'itinerary', { id: uniqueId, name: val });
-            };
-            const removePlace = async (index) => {
-                const item = itinerary.value[index];
-                itinerary.value.splice(index, 1);
-                await sendToApi('del', 'itinerary', item.id);
-            };
-
-            // --- 帳目 ---
             const addExpense = async () => {
                 if (!newExpense.value.title || !newExpense.value.amount) return;
                 const uniqueId = generateId();
                 const dataObj = { id: uniqueId, ...newExpense.value, involved: [...newExpense.value.involved] };
                 expenses.value.unshift(dataObj);
-                const apiObj = { ...dataObj, involved: dataObj.involved }; 
-                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name || '', involved: people.value.map(p=>p.name) };
-                await sendToApi('add', 'expenses', apiObj);
+                await sendToApi('add', 'expenses', { ...dataObj, involved: dataObj.involved.join(',') });
+                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name||'', involved: people.value.map(p=>p.name) };
             };
             const removeExpense = async (index) => {
                 const item = expenses.value[index];
@@ -234,26 +252,18 @@
                 await sendToApi('del', 'expenses', item.id);
             };
 
-            // --- 計算 ---
             const totalExpense = computed(() => expenses.value.reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
             const balanceSheet = computed(() => {
                 if (people.value.length === 0) return [];
                 let balances = {};
-                // 初始化
                 people.value.forEach(p => balances[p.name] = 0);
-                
                 expenses.value.forEach(exp => {
                     const amount = Number(exp.amount) || 0;
                     const payer = exp.payer;
-                    // 防呆：如果雲端資料的付款人不在現在名單內 (例如被刪了)，就略過不計
                     if (balances[payer] === undefined) return;
-
                     balances[payer] += amount;
-                    
-                    // 計算分攤
                     const involvedList = (exp.involved && exp.involved.length > 0) ? exp.involved : people.value.map(p=>p.name);
                     const validInvolved = involvedList.filter(name => balances[name] !== undefined);
-                    
                     if (validInvolved.length > 0) {
                         const splitAmount = amount / validInvolved.length;
                         validInvolved.forEach(name => balances[name] -= splitAmount);
@@ -262,11 +272,11 @@
                 return Object.keys(balances).map(name => ({ name: name, balance: balances[name] }));
             });
 
-            const openMap = (name) => window.open(`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(name)}`, '_blank');
+            const openMap = (name) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`, '_blank');
             const formatInvolved = (list) => Array.isArray(list) ? list.join(', ') : list;
 
             return {
-                currentTab, people, itinerary, expenses, newPlace, newPerson, newExpense, isLoading,
+                currentTab, currentDay, people, itinerary, filteredItinerary, expenses, newPlace, newPerson, newExpense, isLoading,
                 addPlace, removePlace, openMap, addExpense, removeExpense, addPerson, removePerson,
                 totalExpense, balanceSheet, formatInvolved, fetchData
             };
@@ -275,8 +285,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
