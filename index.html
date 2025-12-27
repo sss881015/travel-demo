@@ -10,7 +10,7 @@
     <meta name="format-detection" content="telephone=no">
     
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -157,11 +157,19 @@
                 <input v-model="newPerson" type="text" placeholder="名字" class="flex-1 bg-gray-100 p-2 rounded">
                 <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded">新增</button>
             </div>
-            <div class="space-y-2">
+            <div class="space-y-2 mb-10">
                 <div v-for="(p, index) in people" :key="p.id" class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
                     <span class="font-medium">{{ p.name }}</span>
                     <button @click="removePerson(index)" class="text-red-400 text-sm">移除</button>
                 </div>
+            </div>
+
+            <div class="border-t pt-6 mt-6">
+                <h3 class="font-bold mb-2 text-red-600">⚠️ 危險區域</h3>
+                <p class="text-xs text-gray-500 mb-4">旅行結束後，可以按下方按鈕清除所有資料（行程、帳目、成員），讓資料庫變回空白。</p>
+                <button @click="resetApp" class="w-full bg-red-50 text-red-600 border border-red-200 py-3 rounded-lg font-bold active:bg-red-100 transition">
+                    🗑️ 重置所有資料
+                </button>
             </div>
         </div>
 
@@ -186,32 +194,27 @@
 
     createApp({
         setup() {
-            // ★★★ 請務必替換成您的 Google Apps Script 網址 (要以 /exec 結尾) ★★★
-            const API_URL = 'https://script.google.com/macros/s/AKfycbz_JmdynmF2yJ7gvY21rEuw9nuferMeVxFCrGqgSlpKoqP-_cTzFNCa-s7gv9y97uLR/exec';
+            // ★★★ 請替換成您的 API 網址 ★★★
+            const API_URL = 'https://script.google.com/macros/s/AKfycbzCY554TEj4JSALyOrGhpiXE97zP2W3jRg8huIIbJBY7gBdwbBv4EMvW70lxqH5NxzE/exec';
 
             const currentTab = ref('itinerary');
             const isLoading = ref(false);
-            
-            // 天數相關
             const currentDay = ref(1);
             const totalDays = ref(1);
 
-            // 資料狀態
             const people = ref([]);
             const itinerary = ref([]);
             const expenses = ref([]);
 
-            // 輸入框狀態
             const newPlace = ref('');
             const newPerson = ref('');
             const newExpense = ref({ title: '', amount: '', payer: '', involved: [] });
 
-            // 產生 ID
             const generateId = () => Date.now() + '_' + Math.floor(Math.random() * 1000);
 
-            // --- API 連線 ---
+            // Fetch
             const fetchData = async () => {
-                if(!API_URL.includes('google')) return alert('請先在程式碼中設定 API 網址');
+                if(!API_URL.includes('google')) return alert('請先設定 API 網址');
                 isLoading.value = true;
                 try {
                     const [resItin, resExp, resPpl] = await Promise.all([
@@ -220,7 +223,6 @@
                         fetch(`${API_URL}?type=people`)
                     ]);
                     
-                    // 1. 處理行程 & 自動計算總天數
                     const itinData = await resItin.json();
                     itinerary.value = itinData;
                     if (itinData.length > 0) {
@@ -231,29 +233,20 @@
                         if (maxDay > totalDays.value) totalDays.value = maxDay;
                     }
 
-                    // 2. 處理帳目
                     expenses.value = await resExp.json();
-
-                    // 3. 處理成員
                     const pplData = await resPpl.json();
                     people.value = pplData.length ? pplData : [{id: 'default', name: '我'}];
-
-                    // 初始化記帳選單
+                    
                     if(people.value.length > 0) {
                         newExpense.value.payer = people.value[0].name;
                         newExpense.value.involved = people.value.map(p => p.name);
                     }
-
-                } catch (e) {
-                    console.error('連線錯誤:', e);
-                } finally {
-                    isLoading.value = false;
-                }
+                } catch (e) { console.error(e); } finally { isLoading.value = false; }
             };
 
             onMounted(() => fetchData());
 
-            // 通用 API 發送
+            // API Send
             const sendToApi = async (action, type, dataOrId) => {
                 const body = { action, type };
                 if (action === 'add') body.data = dataOrId;
@@ -261,32 +254,52 @@
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
             };
 
-            // --- 天數功能 ---
-            const addNewDay = () => {
-                totalDays.value++;
-                currentDay.value = totalDays.value;
+            // 重置功能
+            const resetApp = async () => {
+                if (!confirm('警告：這將會「永久刪除」所有行程、帳目和成員資料！\n\n確定要清空嗎？')) return;
+                if (!confirm('再次確認：刪除後無法復原，真的要全部重置？')) return;
+
+                isLoading.value = true;
+                try {
+                    // 呼叫後端重置
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'reset_all', type: 'all' })
+                    });
+                    
+                    // 清空前端狀態
+                    itinerary.value = [];
+                    expenses.value = [];
+                    people.value = [{id: 'default', name: '我'}]; // 留一個預設
+                    totalDays.value = 1;
+                    currentDay.value = 1;
+                    
+                    alert('已重置所有資料，可以開始新的旅程了！');
+                } catch (e) {
+                    alert('重置失敗，請檢查網路連線');
+                    console.error(e);
+                } finally {
+                    isLoading.value = false;
+                }
             };
 
-            // --- 行程功能 ---
-            const filteredItinerary = computed(() => {
-                return itinerary.value.filter(item => {
-                    const d = item.day ? parseInt(item.day) : 1;
-                    return d === currentDay.value;
-                });
-            });
+            // Helpers
+            const addNewDay = () => { totalDays.value++; currentDay.value = totalDays.value; };
+            const openMap = (name) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`, '_blank');
+            const formatInvolved = (list) => Array.isArray(list) ? list.join(', ') : list;
 
+            // Logic
+            const filteredItinerary = computed(() => itinerary.value.filter(item => (item.day ? parseInt(item.day) : 1) === currentDay.value));
+            
             const addPlace = async () => {
                 if (!newPlace.value.trim()) return;
                 const uniqueId = generateId();
                 const name = newPlace.value;
                 const day = currentDay.value;
-
                 itinerary.value.push({ id: uniqueId, name: name, day: day });
                 newPlace.value = '';
-
                 await sendToApi('add', 'itinerary', { id: uniqueId, name: name, day: day });
             };
-
             const removePlace = async (idToDelete) => {
                 const index = itinerary.value.findIndex(item => item.id === idToDelete);
                 if (index !== -1) {
@@ -295,31 +308,15 @@
                 }
             };
 
-            const openMap = (name) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`, '_blank');
-
-            // --- 記帳功能 ---
             const addExpense = async () => {
                 if (!newExpense.value.title || !newExpense.value.amount) return;
                 const uniqueId = generateId();
-                const dataObj = { 
-                    id: uniqueId, 
-                    title: newExpense.value.title, 
-                    amount: newExpense.value.amount, 
-                    payer: newExpense.value.payer, 
-                    involved: [...newExpense.value.involved] 
-                };
-
+                const dataObj = { id: uniqueId, ...newExpense.value, involved: [...newExpense.value.involved] };
                 expenses.value.unshift(dataObj);
-                
-                // 傳給後端前，將 involved 轉字串 (雖然 v8.0 後端會自動處理，但這裡先轉比較保險)
                 const apiObj = { ...dataObj, involved: dataObj.involved.join(',') };
-                
-                // 重置
-                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name || '', involved: people.value.map(p=>p.name) };
-
+                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name||'', involved: people.value.map(p=>p.name) };
                 await sendToApi('add', 'expenses', apiObj);
             };
-
             const removeExpense = async (index) => {
                 const item = expenses.value[index];
                 if (!item.id) return;
@@ -327,17 +324,15 @@
                 await sendToApi('del', 'expenses', item.id);
             };
 
-            // --- 成員功能 ---
             const addPerson = async () => {
                 if (!newPerson.value.trim()) return;
                 const uniqueId = generateId();
                 const name = newPerson.value;
                 people.value.push({ id: uniqueId, name: name });
-                newExpense.value.involved.push(name); // 自動勾選
+                newExpense.value.involved.push(name);
                 newPerson.value = '';
                 await sendToApi('add', 'people', { id: uniqueId, name: name });
             };
-
             const removePerson = async (index) => {
                 const item = people.value[index];
                 if (!item.id || !confirm('確定移除？')) return;
@@ -345,25 +340,18 @@
                 await sendToApi('del', 'people', item.id);
             };
 
-            // --- 結算邏輯 ---
             const totalExpense = computed(() => expenses.value.reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
-            
             const balanceSheet = computed(() => {
                 if (people.value.length === 0) return [];
                 let balances = {};
                 people.value.forEach(p => balances[p.name] = 0);
-                
                 expenses.value.forEach(exp => {
                     const amount = Number(exp.amount) || 0;
                     const payer = exp.payer;
                     if (balances[payer] === undefined) return;
-                    
                     balances[payer] += amount;
                     const involvedList = (exp.involved && exp.involved.length > 0) ? exp.involved : people.value.map(p=>p.name);
-                    
-                    // 過濾掉已經刪除的人
                     const validInvolved = involvedList.filter(name => balances[name] !== undefined);
-                    
                     if (validInvolved.length > 0) {
                         const splitAmount = amount / validInvolved.length;
                         validInvolved.forEach(name => balances[name] -= splitAmount);
@@ -372,27 +360,15 @@
                 return Object.keys(balances).map(name => ({ name: name, balance: balances[name] }));
             });
 
-            const formatInvolved = (list) => Array.isArray(list) ? list.join(', ') : list;
-
             return {
-                currentTab, isLoading,
-                // 天數
-                currentDay, totalDays, addNewDay,
-                // 資料
+                currentTab, isLoading, currentDay, totalDays, addNewDay,
                 people, itinerary, filteredItinerary, expenses,
-                // 輸入框
                 newPlace, newPerson, newExpense,
-                // 動作
-                addPlace, removePlace, openMap, 
-                addExpense, removeExpense, 
-                addPerson, removePerson,
-                fetchData,
-                // 計算
-                totalExpense, balanceSheet, formatInvolved
+                addPlace, removePlace, openMap, addExpense, removeExpense, addPerson, removePerson, resetApp,
+                totalExpense, balanceSheet, formatInvolved, fetchData
             };
         }
     }).mount('#app');
 </script>
 </body>
 </html>
-
