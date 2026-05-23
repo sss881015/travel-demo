@@ -1,375 +1,3710 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>出發囉</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-    
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGI2NmMzO2JvcmRlci1yYWRpdXM6MjAlIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzY4IDE5MkwxNDQgMTkyIDE0NCAxNDMgMTkyIDExMiAyMjEgMTEyIDIzNyA5NiAzMjAgOTYgMzM2IDExMiAzODQgMTEyIDM4NCAxNjAgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDE2MHpNMzY4IDE5Mkw0MTYgMjI0IDQxNiAzMzYgMzY4IDM2OCAxNDQgMzY4IDk2IDMzNiA5NiAyMjQgMTQ0IDE5MkwxNDQgMzY4IDM2OCAzNjh6Ii8+PC9zdmc+">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>出發囉</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #f0f2f5; 
-            -webkit-user-select: none; user-select: none;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .card { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
-        input, select { -webkit-user-select: text; user-select: text; }
-        .checkbox-wrapper input:checked + div {
-            background-color: #dbeafe; color: #2563eb; border-color: #2563eb;
-        }
-        .day-tab-active { background-color: #2563eb; color: white; border-color: #2563eb; }
-        .day-tab-inactive { background-color: white; color: #6b7280; border-color: #e5e7eb; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .loading-bar {
-            position: fixed; top: 0; left: 0; right: 0; height: 3px; background: #2563eb; z-index: 9999;
-            animation: loading 1s infinite linear;
-        }
-        @keyframes loading { 0% { width: 0%; left: 0; } 50% { width: 50%; left: 25%; } 100% { width: 100%; left: 100%; } }
-    </style>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+    }
+
+    .mobile-container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #f8fafc;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      min-height: 0;
+    }
+
+    .content-fixed {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      min-height: 0;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 16px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    input, select, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      height: 54px;
+      padding: 0 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: auto;
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .day-tab-active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .day-tab-inactive {
+      background: white;
+      color: #64748b;
+      border-color: #e2e8f0;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #2563eb;
+      z-index: 9999;
+      animation: loading 1s infinite linear;
+    }
+
+    @keyframes loading {
+      0% { width: 0%; left: 0; }
+      50% { width: 50%; left: 25%; }
+      100% { width: 100%; left: 100%; }
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      background-color: #e5e7eb;
+      border-radius: 14px;
+    }
+
+    .suggestions-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      z-index: 50;
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-top: 4px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .suggestion-item {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .suggestion-item:hover {
+      background-color: #f0f9ff;
+    }
+
+    .checkbox-wrapper input:checked + div {
+      background-color: #dbeafe;
+      color: #1e40af;
+      border-color: #2563eb;
+      font-weight: bold;
+    }
+
+    .stat-bar {
+      transition: width 0.5s ease-in-out;
+    }
+
+    .gmnoprint a, .gmnoprint span, .gm-style-cc {
+      display: none;
+    }
+
+    img[src*="google"] {
+      display: inline !important;
+    }
+
+    .drag-handle {
+      cursor: grab;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-card {
+      width: 92%;
+      max-width: 380px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .day-btn-wrap {
+      position: relative;
+    }
+
+    .day-x {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.15);
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .day-x:active {
+      transform: scale(0.95);
+    }
+
+    .small-btn {
+      height: 46px;
+      border-radius: 12px;
+      font-weight: 800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      background: #f1f5f9;
+      color: #334155;
+      transition: transform 0.08s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .tab-panel {
+      min-height: 0;
+    }
+
+    .itinerary-card {
+      overflow: hidden;
+    }
+
+    .itinerary-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .itinerary-content {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .itinerary-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+      margin-bottom: 4px;
+    }
+
+    .itinerary-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    .itinerary-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    .itinerary-tags {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .itinerary-message {
+      width: 100%;
+      min-width: 0;
+      margin-top: 4px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #f3f4f6;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .itinerary-message a {
+      color: #2563eb;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .itinerary-message a:active {
+      opacity: 0.8;
+    }
+
+    .itinerary-actions {
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    .map-mode-btn {
+      height: 44px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #64748b;
+      transition: all 0.2s ease;
+    }
+
+    .map-mode-btn-active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+    }
+  </style>
 </head>
 <body>
 
-<div id="app" class="max-w-md mx-auto min-h-screen flex flex-col">
-    
-    <div v-if="isLoading" class="loading-bar"></div>
+<div id="app" class="mobile-container">
+  <div v-if="isLoading" class="loading-bar"></div>
 
-    <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">☁️ 出發囉</h1>
-        <button @click="fetchData" class="text-xs bg-blue-700 px-3 py-1 rounded-full text-blue-100 active:scale-95">↻ 同步</button>
+  <!-- Lobby -->
+  <div v-if="currentView === 'lobby'" class="content-scroll p-6 justify-center bg-gray-50">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">✈️ 出發囉</h1>
+
+    <div class="space-y-4 mb-8">
+      <div
+        v-for="trip in trips"
+        :key="trip.id"
+        @click="selectTrip(trip)"
+        class="card flex justify-between items-center active:scale-95 transition cursor-pointer border-l-4 border-blue-500 hover:shadow-md"
+      >
+        <div>
+          <div class="font-bold text-xl text-gray-900">{{ trip.name }}</div>
+          <div class="text-sm text-gray-500">📍 {{ trip.city }}</div>
+        </div>
+        <div class="text-2xl text-gray-300">➜</div>
+      </div>
+
+      <div v-if="trips.length === 0" class="text-center text-gray-400 py-10">尚無旅程</div>
+    </div>
+
+    <div class="card border border-blue-100">
+      <h3 class="font-bold text-gray-700 mb-3">新增旅程</h3>
+      <div class="flex flex-col gap-3">
+        <input v-model="newTripName" placeholder="旅程名稱">
+        <input v-model="newTripCity" placeholder="主要城市">
+        <button
+          @click="createTrip"
+          class="w-full bg-blue-600 text-white h-[54px] rounded-xl font-bold shadow active:scale-95 transition text-lg"
+          :disabled="isLoading"
+        >建立</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div v-else class="flex flex-col h-full overflow-hidden">
+    <header class="bg-blue-600 text-white p-4 pt-12 pb-4 shadow-md sticky top-0 z-50 flex justify-between items-center flex-shrink-0">
+      <div>
+        <h1 class="text-lg font-bold tracking-wide">{{ currentTrip.name }}</h1>
+        <div class="text-xs text-blue-200">
+          Day {{ currentDay }} | {{ dayLabel(currentDay) }} | {{ currentTrip.city }}
+        </div>
+      </div>
+      <button
+        @click="manualSync"
+        class="text-xs bg-white/20 px-3 py-1 rounded-full text-white backdrop-blur-sm active:scale-95 disabled:opacity-60"
+        :disabled="isLoading"
+      >{{ isLoading ? '同步中' : '↻ 同步' }}</button>
     </header>
 
-    <main class="flex-1 p-4 pb-24 overflow-y-auto">
-        
-        <div v-if="currentTab === 'itinerary'" class="space-y-4">
-            
-            <div class="flex overflow-x-auto pb-2 gap-2 no-scrollbar items-center">
-                <button v-for="d in totalDays" :key="d" 
-                    @click="currentDay = d"
-                    class="px-4 py-2 rounded-full border text-sm font-bold whitespace-nowrap transition flex-shrink-0 tap-highlight-transparent"
-                    :class="currentDay === d ? 'day-tab-active' : 'day-tab-inactive'">
-                    Day {{ d }}
-                </button>
-                <button @click="addNewDay" class="px-3 py-2 rounded-full border border-gray-300 text-gray-500 bg-white font-bold flex-shrink-0 active:bg-gray-100 tap-highlight-transparent">
-                    +
-                </button>
-            </div>
+    <main
+      :class="currentTab === 'map' ? 'content-fixed' : 'content-scroll'"
+      class="bg-gray-50"
+    >
+      <!-- Itinerary -->
+      <div v-show="currentTab === 'itinerary'" class="p-4 space-y-4 pb-24 tab-panel">
+        <div class="flex overflow-x-auto pb-2 gap-2 no-scrollbar items-center flex-shrink-0 relative z-50">
+          <div v-for="d in totalDays" :key="d" class="day-btn-wrap flex-shrink-0">
+            <button
+              @click.stop.prevent="onDayClick(d)"
+              @dblclick.stop.prevent="onDayDblClick(d)"
+              class="px-4 py-2 rounded-full border text-sm font-bold whitespace-nowrap transition"
+              :class="currentDay === d ? 'day-tab-active' : 'day-tab-inactive'"
+            >
+              <div>Day {{ d }}</div>
+              <div class="text-[10px] font-normal opacity-90">
+                {{ dayLabel(d) || '—' }}
+              </div>
+            </button>
 
-            <div class="card p-4">
-                <div class="flex gap-2">
-                    <input v-model="newPlace" @keyup.enter="addPlace" type="text" :placeholder="'新增 Day ' + currentDay + ' 行程'" class="flex-1 border-0 bg-gray-100 p-3 rounded-lg outline-none text-lg">
-                    <button @click="addPlace" class="bg-blue-600 text-white w-12 rounded-lg text-2xl shadow active:scale-95 transition" :disabled="isLoading">+</button>
-                </div>
-            </div>
+            <div class="day-x" v-if="totalDays > 1" @click.stop.prevent="deleteDay(d)">×</div>
+          </div>
 
-            <div class="space-y-3">
-                <div v-for="(place, index) in filteredItinerary" :key="place.id" class="card p-4 flex justify-between items-center active:scale-[0.99] transition">
-                    <div class="flex-1" @click="openMap(place.name)">
-                        <div class="font-bold text-gray-800 text-lg">{{ place.name }}</div>
-                        <div class="text-xs text-blue-500 mt-1">🗺️ 導航</div>
-                    </div>
-                    <button @click.stop="removePlace(place.id)" class="text-gray-300 hover:text-red-500 px-2 text-xl" :disabled="isLoading">×</button>
-                </div>
-                <div v-if="filteredItinerary.length === 0 && !isLoading" class="text-center text-gray-400 mt-10">Day {{ currentDay }} 尚無行程</div>
-            </div>
+          <button
+            @click="addNewDay"
+            class="px-3 py-2 rounded-full border border-gray-300 bg-white font-bold flex-shrink-0 shadow-sm text-gray-600"
+          >+</button>
         </div>
 
-        <div v-if="currentTab === 'money'" class="space-y-4">
-            
-            <div class="card p-4 bg-gradient-to-r from-gray-800 to-gray-700 text-white shadow-lg">
-                <div class="flex justify-between items-end mb-4">
-                    <span class="text-gray-300 text-sm">總支出</span>
-                    <span class="text-2xl font-bold">${{ totalExpense }}</span>
+        <div class="card relative space-y-2 flex-shrink-0">
+          <div class="flex gap-2 relative">
+            <input
+              v-model="newPlace"
+              @input="searchPlacesInput"
+              type="text"
+              :placeholder="'搜尋 ' + currentTrip.city + '...'"
+              class="flex-1 font-bold"
+            >
+            <button
+              @click="addPlace"
+              class="bg-blue-600 text-white w-[54px] h-[54px] rounded-xl text-3xl shadow active:scale-95 transition flex items-center justify-center pb-1 flex-shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+              :disabled="isAddingPlace"
+            >+</button>
+
+            <div v-if="newPlace.length > 0 && (searchResults.length > 0 || isSearching || isCoordinateMode)" class="suggestions-list">
+              <div v-if="isSearching" class="p-3 text-center text-gray-400 text-sm">搜尋中...</div>
+
+              <div
+                v-if="isCoordinateMode"
+                @click="useCoordinateInput"
+                class="suggestion-item bg-green-50 hover:bg-green-100 border-green-200"
+              >
+                <span class="text-xl">📍</span>
+                <div>
+                  <div class="font-bold text-green-700 text-sm">{{ resolvedCoordName || '座標模式' }}</div>
+                  <div class="text-xs text-green-600">點擊使用</div>
                 </div>
-                <div class="space-y-2 border-t border-gray-600 pt-3">
-                    <div v-for="result in balanceSheet" :key="result.name" class="flex justify-between text-sm items-center">
-                        <span class="text-gray-200">{{ result.name }}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-400" v-if="result.balance !== 0">{{ result.balance > 0 ? '應收' : '應付' }}</span>
-                            <span :class="result.balance >= 0 ? 'text-green-300' : 'text-red-300'" class="font-mono font-bold text-base">
-                                ${{ Math.abs(result.balance).toFixed(0) }}
-                            </span>
-                        </div>
-                    </div>
+              </div>
+
+              <div
+                v-for="item in searchResults"
+                :key="item.place_id"
+                @click="selectPlace(item)"
+                class="suggestion-item hover:bg-blue-50"
+              >
+                <span class="text-xl">📍</span>
+                <div class="overflow-hidden">
+                  <div class="font-bold text-gray-800 text-sm truncate">{{ item.structured_formatting.main_text }}</div>
+                  <div class="text-xs text-gray-500 truncate">{{ item.structured_formatting.secondary_text }}</div>
                 </div>
+              </div>
+
+              <div
+                v-if="!isCoordinateMode"
+                @click="searchInExternalMap"
+                class="suggestion-item hover:bg-gray-100 border-t-2 border-gray-100 cursor-pointer"
+              >
+                <span class="text-xl">🔎</span>
+                <div class="flex-1">
+                  <div class="font-bold text-blue-600 text-sm">找不到？去 {{ isKoreaTrip ? 'Naver Map' : 'Google Maps' }} 找</div>
+                  <div class="text-xs text-gray-400">可複製座標貼回來</div>
+                </div>
+                <span class="text-gray-300 text-lg">➜</span>
+              </div>
             </div>
+          </div>
 
-            <div class="card p-4 border border-blue-100">
-                <div class="grid grid-cols-3 gap-2 mb-3">
-                    <input v-model="newExpense.title" type="text" placeholder="項目" class="col-span-2 bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200 outline-none">
-                    <input v-model.number="newExpense.amount" type="number" placeholder="$" class="bg-gray-50 p-3 rounded-lg border-0 ring-1 ring-gray-200 outline-none">
-                </div>
-                
-                <div class="mb-3 flex gap-2 items-center">
-                    <span class="text-xs text-gray-500 w-12">付款人</span>
-                    <select v-model="newExpense.payer" class="flex-1 bg-gray-50 p-2 rounded border-0 ring-1 ring-gray-200">
-                        <option v-for="p in people" :value="p.name">{{ p.name }}</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <span class="text-xs text-gray-500 block mb-1">分攤給 (點擊切換)</span>
-                    <div class="flex flex-wrap gap-2">
-                        <label v-for="p in people" :key="p.id" class="checkbox-wrapper cursor-pointer relative">
-                            <input type="checkbox" :value="p.name" v-model="newExpense.involved" class="absolute opacity-0 w-0 h-0">
-                            <div class="px-3 py-1 rounded-full border border-gray-200 text-sm text-gray-500 bg-white transition select-none">
-                                {{ p.name }}
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <button @click="addExpense" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition disabled:opacity-50" :disabled="!newExpense.title || !newExpense.amount || isLoading">
-                    記帳
-                </button>
-            </div>
-
-            <div class="space-y-2 pb-10">
-                <div v-for="(exp, index) in expenses" :key="exp.id" class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
-                    <div>
-                        <div class="font-bold text-gray-800">{{ exp.title }}</div>
-                        <div class="text-xs text-gray-500">
-                            <span class="font-bold text-blue-600">{{ exp.payer }}</span> 先付 | 分攤: {{ formatInvolved(exp.involved) }}
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-800 text-lg">${{ exp.amount }}</span>
-                        <button @click="removeExpense(index)" class="text-gray-300 hover:text-red-500 px-2 text-xl" :disabled="isLoading">×</button>
-                    </div>
-                </div>
-            </div>
+          <div class="flex gap-2 items-start">
+            <input v-model="newTime" type="time" class="w-1/3 text-center font-mono">
+            <textarea v-model="newNote" rows="2" placeholder="備註..." class="flex-1 min-h-[54px] resize-none"></textarea>
+          </div>
         </div>
 
-        <div v-if="currentTab === 'settings'" class="card p-4">
-            <h3 class="font-bold mb-4 text-gray-700">👥 成員管理</h3>
-            <div class="flex gap-2 mb-6">
-                <input v-model="newPerson" type="text" placeholder="名字" class="flex-1 bg-gray-100 p-2 rounded">
-                <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded">新增</button>
+        <div class="card space-y-3 flex-shrink-0">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="font-bold text-gray-800">🚇 交通時間測試</div>
+              <div class="text-xs text-gray-400 mt-0.5">依照目前 Day 的行程順序，計算相鄰兩點的移動時間</div>
             </div>
-            <div class="space-y-2 mb-10">
-                <div v-for="(p, index) in people" :key="p.id" class="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-100">
-                    <span class="font-medium">{{ p.name }}</span>
-                    <button @click="removePerson(index)" class="text-red-400 text-sm">移除</button>
-                </div>
+            <button
+              v-if="routeSegments.length || routeError"
+              @click="clearRouteResults"
+              class="text-xs text-gray-400 px-2 py-1 rounded-lg active:scale-95"
+            >清除</button>
+          </div>
+
+          <div class="flex gap-2">
+            <select v-model="routeTravelMode" class="flex-1 h-[46px]">
+              <option value="TRANSIT">大眾運輸</option>
+              <option value="WALKING">步行</option>
+              <option value="DRIVING">開車</option>
+            </select>
+            <button
+              @click="testDayRoutes"
+              class="w-[110px] bg-blue-600 text-white rounded-xl font-bold active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              :disabled="isRouteLoading"
+            >{{ isRouteLoading ? '計算中' : '測試' }}</button>
+          </div>
+
+          <div v-if="routeError" class="text-xs text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+            {{ routeError }}
+          </div>
+
+          <div v-if="routeSegments.length" class="space-y-2">
+            <div
+              v-for="seg in routeSegments"
+              :key="seg.key"
+              class="bg-gray-50 rounded-xl p-2 text-sm border border-gray-100"
+            >
+              <div class="font-bold text-gray-700 break-words">
+                {{ seg.from }} → {{ seg.to }}
+              </div>
+              <div class="text-gray-500 mt-0.5">
+                約 {{ seg.duration }} / {{ seg.distance }}
+              </div>
             </div>
 
-            <div class="border-t pt-6 mt-6">
-                <h3 class="font-bold mb-2 text-red-600">⚠️ 危險區域</h3>
-                <p class="text-xs text-gray-500 mb-4">旅行結束後，可以按下方按鈕清除所有資料（行程、帳目、成員），讓資料庫變回空白。</p>
-                <button @click="resetApp" class="w-full bg-red-50 text-red-600 border border-red-200 py-3 rounded-lg font-bold active:bg-red-100 transition">
-                    🗑️ 重置所有資料
-                </button>
+            <div class="border-t pt-2 font-bold text-gray-800 text-sm">
+              今日移動總時間：約 {{ routeTotalText }}
             </div>
+          </div>
         </div>
 
+        <div class="space-y-3 pb-20" ref="itineraryListEl">
+          <div
+            v-for="place in filteredItinerary"
+            :key="place.id"
+            :data-id="place.id"
+            class="card itinerary-card flex justify-between items-start gap-3 active:scale-[0.99] transition"
+          >
+            <div class="itinerary-main flex items-start gap-2">
+              <div class="drag-handle text-gray-300 select-none text-2xl leading-none pt-1 shrink-0">≡</div>
+
+              <div class="itinerary-content" @click="handleItineraryContentClick($event, place)">
+                <div class="itinerary-title-row">
+                  <span
+                    v-if="place.time"
+                    class="text-blue-600 font-mono font-bold text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-100 shrink-0"
+                  >{{ formatTime(place.time) }}</span>
+                  <span class="itinerary-title">{{ place.name }}</span>
+                </div>
+
+                <div v-if="place.name_ko" class="itinerary-subtitle">{{ place.name_ko }}</div>
+
+                <div class="itinerary-tags">
+                  <span
+                    v-if="place.lat && place.lng"
+                    class="text-[10px] text-green-600 bg-green-100 px-1.5 rounded font-bold border border-green-200 shrink-0"
+                  >已定位</span>
+                  <span
+                    v-else
+                    class="text-[10px] text-red-400 bg-red-50 px-1.5 rounded font-bold border border-red-200 shrink-0"
+                  >無座標</span>
+
+                  <div v-if="place.message" class="itinerary-message" v-html="linkifyMessage(place.message)"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="itinerary-actions flex items-center gap-2 pl-3 border-l ml-2">
+              <button class="icon-btn" title="編輯" @click.stop="openEditModal(place)" :disabled="isLoading">✏️</button>
+              <button class="icon-btn" title="刪除" @click.stop="removePlace(place.id)" :disabled="isLoading" style="background:#fee2e2;color:#991b1b;">✕</button>
+            </div>
+          </div>
+
+          <div v-if="filteredItinerary.length===0" class="text-center text-gray-400 mt-10">尚無行程</div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div v-show="currentTab === 'map'" class="content-fixed p-4 w-full flex flex-col min-h-0">
+        <div class="flex flex-col gap-2 flex-shrink-0 relative z-40">
+          <div class="relative">
+            <div class="flex shadow-lg rounded-xl overflow-hidden border border-gray-200 bg-white">
+              <input
+                v-model="mapSearchQuery"
+                @input="searchMapPlacesInput"
+                @focus="searchMapPlacesInput"
+                @keyup.enter="searchCityAndJump"
+                type="text"
+                :placeholder="'搜尋 ' + (currentTrip.city || '') + ' 地點...'"
+                class="flex-1 p-3 border-0 outline-none h-[54px] text-gray-900 bg-white"
+                style="border-radius: 0;"
+              >
+              <button @click="searchCityAndJump" class="bg-blue-600 text-white px-4 font-bold h-[54px] shrink-0">前往</button>
+            </div>
+
+            <div v-if="mapSearchQuery.length > 0 && (mapSearchResults.length > 0 || mapIsSearching || mapIsCoordinateMode)" class="suggestions-list">
+              <div v-if="mapIsSearching" class="p-3 text-center text-gray-400 text-sm">搜尋中...</div>
+
+              <div
+                v-if="mapIsCoordinateMode"
+                @click="useMapCoordinateInput"
+                class="suggestion-item bg-green-50 hover:bg-green-100 border-green-200"
+              >
+                <span class="text-xl">📍</span>
+                <div>
+                  <div class="font-bold text-green-700 text-sm">{{ mapResolvedCoordName || '座標模式' }}</div>
+                  <div class="text-xs text-green-600">點擊後直接標在地圖上</div>
+                </div>
+              </div>
+
+              <div
+                v-for="item in mapSearchResults"
+                :key="'map-' + item.place_id"
+                @click="selectMapPlace(item)"
+                class="suggestion-item hover:bg-blue-50"
+              >
+                <span class="text-xl">🗺️</span>
+                <div class="overflow-hidden">
+                  <div class="font-bold text-gray-800 text-sm truncate">{{ item.structured_formatting.main_text }}</div>
+                  <div class="text-xs text-gray-500 truncate">{{ item.structured_formatting.secondary_text }}</div>
+                </div>
+              </div>
+
+              <div
+                v-if="!mapIsCoordinateMode"
+                @click="searchMapInExternalMap"
+                class="suggestion-item hover:bg-gray-100 border-t-2 border-gray-100 cursor-pointer"
+              >
+                <span class="text-xl">🔎</span>
+                <div class="flex-1">
+                  <div class="font-bold text-blue-600 text-sm">找不到？去 {{ isKoreaTrip ? 'Naver Map' : 'Google Maps' }} 找</div>
+                  <div class="text-xs text-gray-400">也可複製座標貼回這裡</div>
+                </div>
+                <span class="text-gray-300 text-lg">➜</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <select v-model="mapDisplayFilter" @change="applyMapDisplayFilter" class="flex-1 h-[46px] text-sm font-bold">
+              <option value="all">全部</option>
+              <option v-for="d in totalDays" :key="'map-filter-' + d" :value="'day-' + d">Day {{ d }}</option>
+            </select>
+            <button @click="fitBoundsToTrip" class="map-mode-btn px-4 shrink-0">顯示行程</button>
+          </div>
+
+          <div v-if="mapLatestResult && mapSearchQuery.trim().length > 0" class="card p-3 space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="font-bold text-gray-800 break-words">{{ mapLatestResult.name || '搜尋結果' }}</div>
+                <div class="text-xs text-gray-500 mt-1 break-words">{{ mapLatestResult.address || '已標在地圖上' }}</div>
+              </div>
+              <span class="text-[10px] text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100 shrink-0">搜尋結果</span>
+            </div>
+
+            <div class="flex gap-2">
+              <select v-model.number="mapAddDay" class="flex-1 h-[46px]">
+                <option v-for="d in totalDays" :key="'map-add-day-' + d" :value="d">加入 Day {{ d }}</option>
+              </select>
+              <button
+                @click="addMapSearchResultToItinerary"
+                class="bg-blue-600 text-white px-4 rounded-xl font-bold text-sm shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                :disabled="isAddingMapPlace"
+              >加入行程</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 min-h-0 mt-2 relative">
+          <div id="map" class="shadow-inner"></div>
+          <div
+            v-if="!isMapReady"
+            class="text-center text-gray-400 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none"
+          >
+            正在載入地圖...
+          </div>
+        </div>
+      </div>
+
+      <!-- Money -->
+      <div v-show="currentTab === 'money'" class="p-4 space-y-4 pb-24 tab-panel">
+        <div class="card bg-gradient-to-r from-gray-800 to-gray-700 text-white shadow-lg">
+          <div class="flex justify-between items-end mb-4">
+            <span class="text-gray-400 text-sm">總支出</span>
+            <span class="text-3xl font-bold tracking-wider">${{ totalExpense }}</span>
+          </div>
+
+          <div class="space-y-1 border-t border-gray-600 pt-3 text-sm">
+            <div v-for="res in balanceSheet" :key="res.name" class="flex justify-between">
+              <span>{{ res.name }}</span>
+              <span :class="res.balance>=0?'text-green-400':'text-red-400'" class="font-bold">
+                {{ res.balance > 0 ? '+' : ''}}{{ Math.round(res.balance) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="categoryAnalysis.length > 0" class="card">
+          <h3 class="font-bold text-gray-700 text-sm mb-3">📊 消費分析</h3>
+          <div class="space-y-3">
+            <div v-for="cat in categoryAnalysis" :key="cat.name" class="text-xs">
+              <div class="flex justify-between mb-1">
+                <span class="text-gray-600">{{ cat.name }}</span>
+                <span class="font-bold text-gray-800">
+                  ${{ cat.total }} ({{ totalExpense ? ((cat.total/totalExpense)*100).toFixed(0) : 0 }}%)
+                </span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2">
+                <div
+                  class="bg-blue-500 h-2 rounded-full stat-bar"
+                  :style="{ width: totalExpense ? (cat.total/totalExpense)*100 + '%' : '0%' }"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border border-blue-100">
+          <div class="grid grid-cols-3 gap-3 mb-3">
+            <input v-model="newExpense.title" placeholder="項目" class="col-span-2">
+            <input v-model.number="newExpense.amount" type="number" placeholder="$" class="font-mono font-bold">
+          </div>
+
+          <div class="mb-3 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            <button
+              v-for="cat in categories"
+              :key="cat"
+              @click="newExpense.category = cat"
+              class="px-3 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap transition"
+              :class="newExpense.category === cat ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-200'"
+            >{{ cat }}</button>
+          </div>
+
+          <div class="mb-3 flex gap-2 items-center">
+            <span class="text-lg text-gray-500 font-bold w-10 text-center">付款</span>
+            <select v-model="newExpense.payer" class="flex-1">
+              <option disabled value="">請選擇</option>
+              <option v-for="(p, index) in people" :value="p.name">{{ p.name || '成員 ' + (index+1) }}</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <span class="text-xs text-gray-500 font-bold block mb-2 ml-1">分攤給 (點擊切換)</span>
+            <div class="flex flex-wrap gap-2">
+              <label v-for="(p, index) in people" :key="p.id" class="checkbox-wrapper cursor-pointer relative">
+                <input type="checkbox" :value="p.name" v-model="newExpense.involved" class="absolute opacity-0 w-0 h-0">
+                <div class="px-3 py-1.5 rounded-full border border-gray-200 text-sm bg-white transition select-none text-gray-700 hover:bg-gray-50">
+                  {{ p.name || '成員 ' + (index+1) }}
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button
+            @click="addExpense"
+            class="w-full bg-blue-600 text-white h-[54px] rounded-xl font-bold shadow transition text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+            :disabled="isAddingExpense"
+          >記帳</button>
+        </div>
+
+        <div class="space-y-2">
+          <div
+            v-for="(exp, idx) in filteredExpenses"
+            :key="exp.id"
+            class="card flex justify-between items-center py-3 border-l-4 border-gray-300"
+          >
+            <div class="min-w-0">
+              <div class="font-bold text-gray-800 text-lg break-words">
+                {{ exp.title }}
+                <span class="text-xs font-normal text-white bg-gray-400 px-1.5 py-0.5 rounded ml-1">{{ exp.category }}</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1 break-words">
+                {{ exp.payer }} 先付 <span class="text-gray-300">|</span> {{ formatInvolved(exp.involved) }} 分攤
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-1 shrink-0 pl-2">
+              <span class="font-bold text-xl text-gray-800 font-mono">${{ exp.amount }}</span>
+              <div class="flex items-center gap-1">
+                <button
+                  @click="openEditExpenseModal(exp)"
+                  class="text-gray-300 hover:text-blue-600 px-2"
+                  title="編輯"
+                  :disabled="isSavingExpense"
+                >✏️</button>
+                <button
+                  @click="removeExpense(exp.id)"
+                  class="text-gray-300 hover:text-red-500 px-2"
+                  title="刪除"
+                  :disabled="isSavingExpense"
+                >×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div v-show="currentTab === 'settings'" class="p-4 space-y-4 pb-24 tab-panel">
+        <button
+          @click="exitTrip"
+          class="w-full bg-gray-700 text-white h-[54px] rounded-lg font-bold mb-6 shadow text-lg"
+        >🔙 切換旅程</button>
+
+        <h3 class="font-bold text-gray-700 ml-1">📋 資料管理</h3>
+        <button
+          @click="exportItinerary"
+          class="w-full bg-white text-blue-600 border border-blue-200 h-[54px] rounded-lg font-bold shadow-sm active:scale-95 transition flex justify-center items-center gap-2"
+        ><span>📋</span> 複製行程</button>
+
+        <h3 class="font-bold text-gray-700 mt-6 ml-1">🏨 住宿設定</h3>
+        <div class="card border border-purple-100 space-y-3 relative z-30">
+          <div class="text-xs text-gray-500 leading-5">
+            住宿只會作為地圖參考點顯示，不會影響行程排序與導航。
+          </div>
+
+          <div class="relative">
+            <input
+              v-model="hotelSearchQuery"
+              @input="searchHotelPlacesInput"
+              @focus="searchHotelPlacesInput"
+              placeholder="搜尋住宿名稱或地址"
+              class="font-bold"
+            >
+
+            <div v-if="hotelSearchQuery.length > 0 && (hotelSearchResults.length > 0 || hotelIsSearching)" class="suggestions-list">
+              <div v-if="hotelIsSearching" class="p-3 text-center text-gray-400 text-sm">搜尋中...</div>
+
+              <div
+                v-for="item in hotelSearchResults"
+                :key="'hotel-' + item.place_id"
+                @click="selectHotelPlace(item)"
+                class="suggestion-item hover:bg-purple-50"
+              >
+                <span class="text-xl">🏨</span>
+                <div class="overflow-hidden">
+                  <div class="font-bold text-gray-800 text-sm truncate">{{ item.structured_formatting.main_text }}</div>
+                  <div class="text-xs text-gray-500 truncate">{{ item.structured_formatting.secondary_text }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <select v-model.number="newHotel.start_day" class="flex-1">
+              <option v-for="d in totalDays" :key="'hotel-start-' + d" :value="d">Day {{ d }} 起</option>
+            </select>
+            <select v-model.number="newHotel.end_day" class="flex-1">
+              <option v-for="d in totalDays" :key="'hotel-end-' + d" :value="d">Day {{ d }} 迄</option>
+            </select>
+          </div>
+
+          <button
+            @click="addHotel"
+            class="w-full bg-purple-600 text-white h-[54px] rounded-xl font-bold shadow transition text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+            :disabled="isLoading || isAddingHotel"
+          >{{ isAddingHotel ? '寫入中...' : '新增住宿' }}</button>
+        </div>
+
+        <div v-if="hotels.length" class="space-y-2">
+          <div
+            v-for="hotel in hotels"
+            :key="hotel.id"
+            class="flex justify-between items-start gap-3 p-3 bg-white rounded border border-purple-100 shadow-sm active:scale-[0.99] transition cursor-pointer"
+            @click="openHotelMap(hotel)"
+          >
+            <div class="min-w-0">
+              <div class="font-bold text-gray-800 break-words">🏨 {{ hotel.name }}</div>
+              <div class="text-xs text-gray-500 mt-1 break-words">
+                {{ hotelDayRangeLabel(hotel) }}<span v-if="hotel.address">｜{{ hotel.address }}</span>
+              </div>
+            </div>
+            <button
+              @click.stop="removeHotel(hotel.id)"
+              class="text-red-400 font-bold px-2 shrink-0"
+              :disabled="isDeletingHotel"
+            >刪除</button>
+          </div>
+        </div>
+
+        <h3 class="font-bold text-gray-700 mt-6 ml-1">👥 成員管理</h3>
+        <div class="flex gap-2">
+          <input v-model="newPerson" placeholder="名字" class="flex-1">
+          <button @click="addPerson" class="bg-gray-800 text-white px-4 rounded-lg font-bold">新增</button>
+        </div>
+
+        <div class="space-y-2 mb-10">
+          <div
+            v-for="(p, idx) in people"
+            :key="p.id"
+            class="flex justify-between items-center p-3 bg-white rounded border border-gray-100 shadow-sm"
+          >
+            <span class="font-bold text-gray-800">{{ p.name || '成員 ' + (idx + 1) }}</span>
+            <button @click="removePerson(idx)" class="text-red-400 font-bold px-2">移除</button>
+          </div>
+        </div>
+
+        <div class="border-t pt-4 mt-4 text-center">
+          <button
+            @click="deleteTripTotally"
+            class="w-full bg-red-500 text-white border border-red-600 py-3 rounded-lg font-bold mb-3 shadow-md hover:bg-red-600 transition"
+          >❌ 刪除此旅程</button>
+        </div>
+      </div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around pb-safe pt-2 pb-2 z-50">
-        <button @click="currentTab = 'itinerary'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'itinerary' ? 'text-blue-600' : 'text-gray-400'">
-            <span class="text-xl">📍</span><span class="text-xs mt-1">行程</span>
-        </button>
-        <button @click="currentTab = 'money'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'money' ? 'text-green-600' : 'text-gray-400'">
-            <span class="text-xl">💰</span><span class="text-xs mt-1">分帳</span>
-        </button>
-        <button @click="currentTab = 'settings'" class="flex flex-col items-center w-full tap-highlight-transparent" :class="currentTab === 'settings' ? 'text-gray-600' : 'text-gray-400'">
-            <span class="text-xl">⚙️</span><span class="text-xs mt-1">設定</span>
-        </button>
+    <nav class="bg-white border-t flex justify-around pb-safe pt-2 pb-2 z-50 flex-shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <button @click="switchTab('itinerary')" class="flex flex-col items-center w-full transition duration-200" :class="currentTab==='itinerary'?'text-blue-600 scale-110':'text-gray-400'">
+        <span class="text-2xl mb-0.5">📍</span><span class="text-[10px] font-bold">行程</span>
+      </button>
+      <button @click="switchTab('map')" class="flex flex-col items-center w-full transition duration-200" :class="currentTab==='map'?'text-purple-600 scale-110':'text-gray-400'">
+        <span class="text-2xl mb-0.5">🗺️</span><span class="text-[10px] font-bold">地圖</span>
+      </button>
+      <button @click="switchTab('money')" class="flex flex-col items-center w-full transition duration-200" :class="currentTab==='money'?'text-green-600 scale-110':'text-gray-400'">
+        <span class="text-2xl mb-0.5">💰</span><span class="text-[10px] font-bold">分帳</span>
+      </button>
+      <button @click="switchTab('settings')" class="flex flex-col items-center w-full transition duration-200" :class="currentTab==='settings'?'text-gray-800 scale-110':'text-gray-400'">
+        <span class="text-2xl mb-0.5">⚙️</span><span class="text-[10px] font-bold">設定</span>
+      </button>
     </nav>
+  </div>
 
+  <!-- Day modal -->
+  <div v-if="showDayModal" class="modal-mask" @click.self="closeDayModal">
+    <div class="modal-card space-y-3">
+      <div class="font-bold text-gray-800 text-lg">Day{{ modalDay }} 設定</div>
+
+      <template v-if="modalDay === 1">
+        <div class="text-sm text-gray-500">設定 Day1 日期（其他天自動推算）</div>
+        <input type="date" v-model="dateInput">
+        <button class="w-full bg-blue-600 text-white small-btn active:scale-95" @click="applyDay1Date">套用 Day1 日期</button>
+      </template>
+
+      <div class="border-t pt-3">
+        <div class="text-sm text-gray-500 mb-2">交換天數（Day{{ modalDay }} ↔ 其他天）</div>
+        <div class="flex gap-2">
+          <select v-model.number="swapTargetDay" class="flex-1">
+            <option :value="0" disabled>選擇要交換的天數</option>
+            <option v-for="d in totalDays" :key="'swap'+d" :value="d" v-if="d !== modalDay">Day {{ d }}</option>
+          </select>
+          <button class="w-[120px] bg-gray-900 text-white small-btn active:scale-95" @click="swapWithDay">交換</button>
+        </div>
+      </div>
+
+      <button class="w-full border text-gray-600 small-btn active:scale-95" @click="closeDayModal">關閉</button>
+    </div>
+  </div>
+
+  <!-- Edit itinerary modal -->
+  <div v-if="showEditModal" class="modal-mask" @click.self="closeEditModal">
+    <div class="modal-card space-y-3">
+      <div class="font-bold text-gray-800 text-lg">編輯行程</div>
+
+      <div class="space-y-2">
+        <div class="text-xs font-bold text-gray-500 ml-1">名稱</div>
+        <input v-model="editPlace.name" placeholder="地點名稱">
+
+        <div class="text-xs font-bold text-gray-500 ml-1">Day</div>
+        <select v-model.number="editPlace.day">
+          <option v-for="d in totalDays" :key="'edit-day-' + d" :value="d">Day {{ d }}</option>
+        </select>
+
+        <div class="text-xs font-bold text-gray-500 ml-1">時間</div>
+        <input v-model="editPlace.time" type="time">
+
+        <div class="text-xs font-bold text-gray-500 ml-1">備註</div>
+        <textarea v-model="editPlace.message" rows="3" placeholder="備註..."></textarea>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button class="flex-1 border text-gray-600 small-btn active:scale-95" @click="closeEditModal">取消</button>
+        <button class="flex-1 bg-blue-600 text-white small-btn active:scale-95" @click="saveEditPlace" :disabled="isLoading">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit expense modal -->
+  <div v-if="showEditExpenseModal" class="modal-mask" @click.self="closeEditExpenseModal">
+    <div class="modal-card space-y-3">
+      <div class="font-bold text-gray-800 text-lg">編輯記帳</div>
+
+      <div class="space-y-2">
+        <div class="text-xs font-bold text-gray-500 ml-1">項目</div>
+        <input v-model="editExpense.title" placeholder="項目名稱">
+
+        <div class="text-xs font-bold text-gray-500 ml-1">金額</div>
+        <input v-model.number="editExpense.amount" type="number" placeholder="$" class="font-mono font-bold">
+
+        <div class="text-xs font-bold text-gray-500 ml-1">分類</div>
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button
+            v-for="cat in categories"
+            :key="'edit-exp-cat-' + cat"
+            @click="editExpense.category = cat"
+            class="px-3 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap transition"
+            :class="editExpense.category === cat ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-200'"
+          >{{ cat }}</button>
+        </div>
+
+        <div class="text-xs font-bold text-gray-500 ml-1">Day</div>
+        <select v-model.number="editExpense.day">
+          <option v-for="d in totalDays" :key="'edit-exp-day-' + d" :value="d">Day {{ d }}</option>
+        </select>
+
+        <div class="text-xs font-bold text-gray-500 ml-1">付款人</div>
+        <select v-model="editExpense.payer">
+          <option disabled value="">請選擇</option>
+          <option v-for="(p, index) in people" :key="'edit-exp-payer-' + p.id" :value="p.name">
+            {{ p.name || '成員 ' + (index+1) }}
+          </option>
+        </select>
+
+        <div>
+          <span class="text-xs text-gray-500 font-bold block mb-2 ml-1">分攤給</span>
+          <div class="flex flex-wrap gap-2">
+            <label v-for="(p, index) in people" :key="'edit-exp-inv-' + p.id" class="checkbox-wrapper cursor-pointer relative">
+              <input type="checkbox" :value="p.name" v-model="editExpense.involved" class="absolute opacity-0 w-0 h-0">
+              <div class="px-3 py-1.5 rounded-full border border-gray-200 text-sm bg-white transition select-none text-gray-700 hover:bg-gray-50">
+                {{ p.name || '成員 ' + (index+1) }}
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button class="flex-1 border text-gray-600 small-btn active:scale-95" @click="closeEditExpenseModal" :disabled="isSavingExpense">取消</button>
+        <button class="flex-1 bg-blue-600 text-white small-btn active:scale-95 disabled:opacity-60" @click="saveEditExpense" :disabled="isSavingExpense">
+          {{ isSavingExpense ? '儲存中...' : '儲存' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, onBeforeUnmount, nextTick, watch } = Vue;
 
-    createApp({
-        setup() {
-            // ★★★ 請替換成您的 API 網址 ★★★
-            const API_URL = 'https://script.google.com/macros/s/AKfycbzCY554TEj4JSALyOrGhpiXE97zP2W3jRg8huIIbJBY7gBdwbBv4EMvW70lxqH5NxzE/exec';
+createApp({
+  setup() {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwtuzN1s5GPivl8vUpBijmi32hdJn0nw9R5BUgXIGULv30c_SGOZWuOthDk_BZFNgsY/exec';
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyCLrHk9V-eQby0aDVx31iwFyqmhI-jIs4Q';
 
-            const currentTab = ref('itinerary');
-            const isLoading = ref(false);
-            const currentDay = ref(1);
-            const totalDays = ref(1);
+    const currentView = ref('lobby');
+    const currentTrip = ref(null);
+    const trips = ref([]);
+    const newTripName = ref('');
+    const newTripCity = ref('');
 
-            const people = ref([]);
-            const itinerary = ref([]);
-            const expenses = ref([]);
+    const currentTab = ref('itinerary');
+    const isLoading = ref(false);
+    const isAutoSyncing = ref(false);
+    const AUTO_SYNC_INTERVAL_MS = 60000;
+    let autoSyncTimer = null;
 
-            const newPlace = ref('');
-            const newPerson = ref('');
-            const newExpense = ref({ title: '', amount: '', payer: '', involved: [] });
+    const isAddingPlace = ref(false);
+    const isAddingMapPlace = ref(false);
+    const isAddingExpense = ref(false);
 
-            const generateId = () => Date.now() + '_' + Math.floor(Math.random() * 1000);
+    const currentDay = ref(1);
+    const totalDays = ref(1);
 
-            // Fetch
-            const fetchData = async () => {
-                if(!API_URL.includes('google')) return alert('請先設定 API 網址');
-                isLoading.value = true;
-                try {
-                    const [resItin, resExp, resPpl] = await Promise.all([
-                        fetch(`${API_URL}?type=itinerary`),
-                        fetch(`${API_URL}?type=expenses`),
-                        fetch(`${API_URL}?type=people`)
-                    ]);
-                    
-                    const itinData = await resItin.json();
-                    itinerary.value = itinData;
-                    if (itinData.length > 0) {
-                        const maxDay = itinData.reduce((max, item) => {
-                            const d = item.day ? parseInt(item.day) : 1;
-                            return d > max ? d : max;
-                        }, 1);
-                        if (maxDay > totalDays.value) totalDays.value = maxDay;
-                    }
+    const people = ref([]);
+    const itinerary = ref([]);
+    const expenses = ref([]);
+    const hotels = ref([]);
 
-                    expenses.value = await resExp.json();
-                    const pplData = await resPpl.json();
-                    people.value = pplData.length ? pplData : [{id: 'default', name: '我'}];
-                    
-                    if(people.value.length > 0) {
-                        newExpense.value.payer = people.value[0].name;
-                        newExpense.value.involved = people.value.map(p => p.name);
-                    }
-                } catch (e) { console.error(e); } finally { isLoading.value = false; }
-            };
+    const newPlace = ref('');
+    const newTime = ref('');
+    const newNote = ref('');
+    const newPerson = ref('');
+    const newExpense = ref({ title: '', amount: '', payer: '', involved: [], category: '飲食', day: 1 });
+    const expenseFilter = ref({ day: 'all', category: 'all', payer: 'all' });
+    const categories = ['飲食', '交通', '住宿', '購物', '門票', '其他'];
 
-            onMounted(() => fetchData());
+    const routeTravelMode = ref('TRANSIT');
+    const routeSegments = ref([]);
+    const routeTotalSeconds = ref(0);
+    const isRouteLoading = ref(false);
+    const routeError = ref('');
 
-            // API Send
-            const sendToApi = async (action, type, dataOrId) => {
-                const body = { action, type };
-                if (action === 'add') body.data = dataOrId;
-                else body.id = dataOrId;
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
-            };
+    const searchResults = ref([]);
+    const isSearching = ref(false);
+    const isCoordinateMode = ref(false);
+    const resolvedCoordName = ref('');
+    const selectedLat = ref(null);
+    const selectedLng = ref(null);
+    const selectedPlaceData = ref(null);
 
-            // 重置功能
-            const resetApp = async () => {
-                if (!confirm('警告：這將會「永久刪除」所有行程、帳目和成員資料！\n\n確定要清空嗎？')) return;
-                if (!confirm('再次確認：刪除後無法復原，真的要全部重置？')) return;
+    const mapSearchQuery = ref('');
+    const mapSearchResults = ref([]);
+    const mapIsSearching = ref(false);
+    const mapIsCoordinateMode = ref(false);
+    const mapResolvedCoordName = ref('');
+    const mapSelectedLat = ref(null);
+    const mapSelectedLng = ref(null);
+    const mapSelectedPlaceData = ref(null);
+    const mapLatestResult = ref(null);
+    const mapAddDay = ref(1);
+    const mapDisplayFilter = ref('all');
+    const isMapReady = ref(false);
+    let mapInstance = null;
+    let mapElementRef = null;
+    let markers = [];
+    let mapSearchMarker = null;
+    let mapRouteLine = null;
+    let infoWindow = null;
+    let autocompleteService = null;
+    let mapSearchTimeout = null;
 
-                isLoading.value = true;
-                try {
-                    // 呼叫後端重置
-                    await fetch(API_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'reset_all', type: 'all' })
-                    });
-                    
-                    // 清空前端狀態
-                    itinerary.value = [];
-                    expenses.value = [];
-                    people.value = [{id: 'default', name: '我'}]; // 留一個預設
-                    totalDays.value = 1;
-                    currentDay.value = 1;
-                    
-                    alert('已重置所有資料，可以開始新的旅程了！');
-                } catch (e) {
-                    alert('重置失敗，請檢查網路連線');
-                    console.error(e);
-                } finally {
-                    isLoading.value = false;
-                }
-            };
+    const newHotel = ref({ start_day: 1, end_day: 1 });
+    const hotelSearchQuery = ref('');
+    const hotelSearchResults = ref([]);
+    const hotelIsSearching = ref(false);
+    const hotelSelectedPlaceData = ref(null);
+    const isAddingHotel = ref(false);
+    const isDeletingHotel = ref(false);
+    let hotelSearchTimeout = null;
 
-            // Helpers
-            const addNewDay = () => { totalDays.value++; currentDay.value = totalDays.value; };
-            const openMap = (name) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`, '_blank');
-            const formatInvolved = (list) => Array.isArray(list) ? list.join(', ') : list;
+    const itineraryListEl = ref(null);
+    let sortable = null;
 
-            // Logic
-            const filteredItinerary = computed(() => itinerary.value.filter(item => (item.day ? parseInt(item.day) : 1) === currentDay.value));
-            
-            const addPlace = async () => {
-                if (!newPlace.value.trim()) return;
-                const uniqueId = generateId();
-                const name = newPlace.value;
-                const day = currentDay.value;
-                itinerary.value.push({ id: uniqueId, name: name, day: day });
-                newPlace.value = '';
-                await sendToApi('add', 'itinerary', { id: uniqueId, name: name, day: day });
-            };
-            const removePlace = async (idToDelete) => {
-                const index = itinerary.value.findIndex(item => item.id === idToDelete);
-                if (index !== -1) {
-                    itinerary.value.splice(index, 1);
-                    await sendToApi('del', 'itinerary', idToDelete);
-                }
-            };
+    const showDayModal = ref(false);
+    const modalDay = ref(1);
+    const dateInput = ref('');
+    const swapTargetDay = ref(0);
 
-            const addExpense = async () => {
-                if (!newExpense.value.title || !newExpense.value.amount) return;
-                const uniqueId = generateId();
-                const dataObj = { id: uniqueId, ...newExpense.value, involved: [...newExpense.value.involved] };
-                expenses.value.unshift(dataObj);
-                const apiObj = { ...dataObj, involved: dataObj.involved.join(',') };
-                newExpense.value = { title: '', amount: '', payer: people.value[0]?.name||'', involved: people.value.map(p=>p.name) };
-                await sendToApi('add', 'expenses', apiObj);
-            };
-            const removeExpense = async (index) => {
-                const item = expenses.value[index];
-                if (!item.id) return;
-                expenses.value.splice(index, 1);
-                await sendToApi('del', 'expenses', item.id);
-            };
+    const showEditModal = ref(false);
+    const editPlaceId = ref('');
+    const editPlace = ref({ name: '', time: '', message: '', day: 1 });
 
-            const addPerson = async () => {
-                if (!newPerson.value.trim()) return;
-                const uniqueId = generateId();
-                const name = newPerson.value;
-                people.value.push({ id: uniqueId, name: name });
-                newExpense.value.involved.push(name);
-                newPerson.value = '';
-                await sendToApi('add', 'people', { id: uniqueId, name: name });
-            };
-            const removePerson = async (index) => {
-                const item = people.value[index];
-                if (!item.id || !confirm('確定移除？')) return;
-                people.value.splice(index, 1);
-                await sendToApi('del', 'people', item.id);
-            };
+    const showEditExpenseModal = ref(false);
+    const editExpenseId = ref('');
+    const editExpense = ref({ title: '', amount: '', payer: '', involved: [], category: '飲食', day: 1 });
+    const isSavingExpense = ref(false);
 
-            const totalExpense = computed(() => expenses.value.reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
-            const balanceSheet = computed(() => {
-                if (people.value.length === 0) return [];
-                let balances = {};
-                people.value.forEach(p => balances[p.name] = 0);
-                expenses.value.forEach(exp => {
-                    const amount = Number(exp.amount) || 0;
-                    const payer = exp.payer;
-                    if (balances[payer] === undefined) return;
-                    balances[payer] += amount;
-                    const involvedList = (exp.involved && exp.involved.length > 0) ? exp.involved : people.value.map(p=>p.name);
-                    const validInvolved = involvedList.filter(name => balances[name] !== undefined);
-                    if (validInvolved.length > 0) {
-                        const splitAmount = amount / validInvolved.length;
-                        validInvolved.forEach(name => balances[name] -= splitAmount);
-                    }
-                });
-                return Object.keys(balances).map(name => ({ name: name, balance: balances[name] }));
-            });
+    const generateId = () => Date.now() + '_' + Math.floor(Math.random() * 1000);
 
-            return {
-                currentTab, isLoading, currentDay, totalDays, addNewDay,
-                people, itinerary, filteredItinerary, expenses,
-                newPlace, newPerson, newExpense,
-                addPlace, removePlace, openMap, addExpense, removeExpense, addPerson, removePerson, resetApp,
-                totalExpense, balanceSheet, formatInvolved, fetchData
-            };
+    const isKoreaCity = (city) => {
+      const s = String(city || '').trim().toLowerCase();
+      const koreaKeywords = [
+        '韓國', '首爾', '釜山', '濟州', '大邱', '仁川', '水原', '江南', '明洞', '弘大',
+        'seoul', 'busan', 'jeju', 'daegu', 'incheon', 'suwon', 'gangnam', 'myeongdong', 'hongdae', 'korea'
+      ];
+      return koreaKeywords.some(k => s.includes(k.toLowerCase()));
+    };
+
+    const isKoreaTrip = computed(() => isKoreaCity(currentTrip.value?.city || ''));
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const toYMD = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    const parseYMD = (s) => {
+      if (!s) return null;
+      const p = String(s).split('-');
+      if (p.length !== 3) return null;
+      const y = parseInt(p[0],10), m = parseInt(p[1],10), d = parseInt(p[2],10);
+      if (!y || !m || !d) return null;
+      return new Date(y, m-1, d, 12, 0, 0);
+    };
+    const addDays = (d, n) => {
+      const x = new Date(d);
+      x.setDate(x.getDate()+n);
+      return x;
+    };
+
+    const dayLabel = (day) => {
+      const base = parseYMD(currentTrip.value?.start_date);
+      if (!base) return '';
+      const dt = addDays(base, day-1);
+      const wk = ['日','一','二','三','四','五','六'][dt.getDay()];
+      return `${dt.getFullYear()}/${pad2(dt.getMonth()+1)}/${pad2(dt.getDate())} (${wk})`;
+    };
+
+    const normalizeInvolved = (list) => {
+      if (Array.isArray(list)) return list.filter(Boolean);
+      if (typeof list === 'string') {
+        return list.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return [];
+    };
+
+    const normalizeExpenseRecord = (item) => ({
+      ...item,
+      amount: Number(item?.amount) || 0,
+      day: item?.day ? parseInt(item.day, 10) || 1 : 1,
+      involved: normalizeInvolved(item?.involved),
+      category: item?.category || '其他',
+      payer: item?.payer || ''
+    });
+
+    // 公帳規則：只要「分攤給」包含公帳，就視為放入公帳。
+    // 這類紀錄仍保留在分帳計算中，但不顯示於前端支出列表，也不納入總支出/消費分析。
+    const PUBLIC_ACCOUNT_NAME = '公帳';
+    const normalizePersonName = (name) => String(name || '').trim();
+    const isPublicAccountFund = (expense) => {
+      const involved = normalizeInvolved(expense?.involved).map(normalizePersonName);
+      return involved.includes(PUBLIC_ACCOUNT_NAME);
+    };
+    const expenseCreatedTime = (expense) => {
+      const fromId = parseInt(String(expense?.id || '').split('_')[0], 10);
+      if (Number.isFinite(fromId)) return fromId;
+      const fromDate = Date.parse(expense?.created_at || expense?.updated_at || '');
+      return Number.isFinite(fromDate) ? fromDate : 0;
+    };
+
+    const normalizeOrderValue = (value) => {
+      if (value === '' || value == null) return null;
+      const num = Number(value);
+      return Number.isFinite(num) && num > 0 ? num : null;
+    };
+
+    const normalizeItineraryRecord = (item) => ({
+      ...item,
+      day: item?.day ? parseInt(item.day, 10) || 1 : 1,
+      order: normalizeOrderValue(item?.order)
+    });
+
+    const normalizeHotelRecord = (item) => ({
+      ...item,
+      start_day: item?.start_day ? parseInt(item.start_day, 10) || 1 : 1,
+      end_day: item?.end_day ? parseInt(item.end_day, 10) || 1 : 1,
+      lat: item?.lat !== '' && item?.lat != null ? Number(item.lat) : null,
+      lng: item?.lng !== '' && item?.lng != null ? Number(item.lng) : null,
+      name: String(item?.name || '').trim(),
+      address: String(item?.address || '').trim(),
+      place_id: String(item?.place_id || '').trim()
+    });
+
+    const isHotelActiveOnDay = (hotel, day) => {
+      const d = parseInt(day, 10) || 1;
+      const start = parseInt(hotel?.start_day, 10) || 1;
+      const end = parseInt(hotel?.end_day, 10) || start;
+      return d >= Math.min(start, end) && d <= Math.max(start, end);
+    };
+
+    const hotelDayRangeLabel = (hotel) => {
+      const start = parseInt(hotel?.start_day, 10) || 1;
+      const end = parseInt(hotel?.end_day, 10) || start;
+      return start === end ? `Day ${start}` : `Day ${Math.min(start, end)} ~ Day ${Math.max(start, end)}`;
+    };
+
+    const hasHotelOverlap = (startDay, endDay, exceptId = '') => {
+      const s = Math.min(parseInt(startDay, 10) || 1, parseInt(endDay, 10) || 1);
+      const e = Math.max(parseInt(startDay, 10) || 1, parseInt(endDay, 10) || 1);
+      return hotels.value.some(h => {
+        if (exceptId && String(h.id) === String(exceptId)) return false;
+        const hs = Math.min(parseInt(h.start_day, 10) || 1, parseInt(h.end_day, 10) || 1);
+        const he = Math.max(parseInt(h.start_day, 10) || 1, parseInt(h.end_day, 10) || 1);
+        return s <= he && e >= hs;
+      });
+    };
+
+    const sortDayItemsByStoredOrder = (list) => {
+      return list.slice().sort((a, b) => {
+        const oa = normalizeOrderValue(a?.order);
+        const ob = normalizeOrderValue(b?.order);
+
+        if (oa != null && ob != null && oa !== ob) return oa - ob;
+        if (oa != null && ob == null) return -1;
+        if (oa == null && ob != null) return 1;
+
+        const ta = timeToNum(a?.time);
+        const tb = timeToNum(b?.time);
+        if (ta !== tb) return ta - tb;
+
+        return String(a?.name || '').localeCompare(String(b?.name || ''));
+      });
+    };
+
+    const getDayOrderedItems = (day) => {
+      const targetDay = parseInt(day, 10) || 1;
+      const list = itinerary.value.filter(i => (i.day ? parseInt(i.day,10) : 1) === targetDay);
+      return sortDayItemsByStoredOrder(list);
+    };
+
+    const applyOrderToLocalItinerary = (day, ids) => {
+      const targetDay = parseInt(day, 10) || 1;
+      const idOrder = Array.isArray(ids) ? ids.map(String) : [];
+      const dayItems = itinerary.value.filter(i => (i.day ? parseInt(i.day,10) : 1) === targetDay);
+      const map = new Map(dayItems.map(item => [String(item.id), item]));
+
+      let order = 1;
+      idOrder.forEach((id) => {
+        const item = map.get(String(id));
+        if (item) {
+          item.order = order++;
+          map.delete(String(id));
         }
-    }).mount('#app');
+      });
+
+      sortDayItemsByStoredOrder(Array.from(map.values())).forEach((item) => {
+        item.order = order++;
+      });
+    };
+
+    const hasCompleteSequentialOrder = (day) => {
+      const items = itinerary.value.filter(i => (i.day ? parseInt(i.day,10) : 1) === (parseInt(day, 10) || 1));
+      if (!items.length) return true;
+
+      const orders = items.map(item => normalizeOrderValue(item.order));
+      if (orders.some(v => v == null)) return false;
+
+      const sorted = orders.slice().sort((a, b) => a - b);
+      if (new Set(sorted).size !== sorted.length) return false;
+
+      return sorted.every((value, index) => value === index + 1);
+    };
+
+    const ensureAllDayOrdersSynced = async (tripId) => {
+      if (!tripId) return;
+      const maxDay = itinerary.value.reduce((m, it) => Math.max(m, it.day ? parseInt(it.day,10) : 1), 1);
+
+      for (let day = 1; day <= maxDay; day++) {
+        const items = getDayOrderedItems(day);
+        if (!items.length) continue;
+        if (hasCompleteSequentialOrder(day)) continue;
+
+        const ids = items.map(item => String(item.id));
+        applyOrderToLocalItinerary(day, ids);
+        try {
+          await saveOrderToDB(tripId, day, ids);
+        } catch (e) {}
+      }
+    };
+
+    const formatInvolved = (list) => {
+      const arr = normalizeInvolved(list);
+      return arr.length === 0 ? '全員' : arr.join(', ');
+    };
+
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '';
+      if (typeof timeStr === 'string' && /^\d{1,2}:\d{2}$/.test(timeStr)) return timeStr;
+      try {
+        const date = new Date(timeStr);
+        if (isNaN(date.getTime())) return timeStr;
+        const h = date.getHours().toString().padStart(2, '0');
+        const m = date.getMinutes().toString().padStart(2, '0');
+        return `${h}:${m}`;
+      } catch (e) {
+        return timeStr;
+      }
+    };
+
+    const timeToNum = (t) => {
+      const s = formatTime(t);
+      if (!s) return 999999;
+      const p = s.split(':');
+      if (p.length !== 2) return 999999;
+      const hh = parseInt(p[0],10);
+      const mm = parseInt(p[1],10);
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return 999999;
+      return hh * 60 + mm;
+    };
+
+    const jsonp = (url, timeoutMs = 30000) => new Promise((resolve, reject) => {
+      const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const sep = url.includes('?') ? '&' : '?';
+      const full = `${url}${sep}callback=${cb}`;
+
+      const s = document.createElement('script');
+      const t = setTimeout(() => {
+        cleanup();
+        reject(new Error('JSONP timeout'));
+      }, timeoutMs);
+
+      const cleanup = () => {
+        clearTimeout(t);
+        if (s.parentNode) s.parentNode.removeChild(s);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+      };
+
+      window[cb] = (data) => {
+        cleanup();
+        resolve(data);
+      };
+
+      s.onerror = () => {
+        cleanup();
+        reject(new Error('JSONP load error'));
+      };
+
+      s.src = full;
+      document.head.appendChild(s);
+    });
+
+    const apiGet = async (paramsObj) => {
+      const qs = new URLSearchParams(paramsObj).toString();
+      return await jsonp(`${API_URL}?${qs}`);
+    };
+
+    const cacheKey = (tripId) => `trip_cache_${tripId}`;
+
+    const saveTripCache = (tripId) => {
+      try {
+        localStorage.setItem(cacheKey(tripId), JSON.stringify({
+          itinerary: itinerary.value,
+          expenses: expenses.value,
+          people: people.value,
+          hotels: hotels.value,
+          trip: currentTrip.value,
+          ts: Date.now()
+        }));
+      } catch(e){}
+    };
+
+    const loadTripCache = (tripId) => {
+      try {
+        const raw = localStorage.getItem(cacheKey(tripId));
+        if (!raw) return false;
+
+        const c = JSON.parse(raw);
+
+        itinerary.value = Array.isArray(c.itinerary) ? c.itinerary.map(normalizeItineraryRecord) : [];
+        expenses.value  = Array.isArray(c.expenses) ? c.expenses.map(normalizeExpenseRecord) : [];
+        people.value    = Array.isArray(c.people) ? c.people : [{id:'default', name:'我'}];
+        hotels.value    = Array.isArray(c.hotels) ? c.hotels.map(normalizeHotelRecord) : [];
+
+        if (c.trip) currentTrip.value = { ...currentTrip.value, ...c.trip };
+
+        const maxDay = itinerary.value.reduce((m, it) =>
+          Math.max(m, it.day ? parseInt(it.day,10) : 1), 1);
+
+        totalDays.value = Math.max(1, maxDay);
+
+        return true;
+      } catch(e){
+        return false;
+      }
+    };
+
+    const pendingWrites = ref([]);
+    const localWriteCount = ref(0);
+
+    const trackWrite = (promise) => {
+      const p = Promise.resolve(promise);
+      pendingWrites.value.push(p);
+
+      const remove = () => {
+        const idx = pendingWrites.value.indexOf(p);
+        if (idx !== -1) pendingWrites.value.splice(idx, 1);
+      };
+
+      p.then(remove, remove);
+      return p;
+    };
+
+    const beginLocalWrite = () => {
+      localWriteCount.value += 1;
+    };
+
+    const endLocalWrite = () => {
+      localWriteCount.value = Math.max(0, localWriteCount.value - 1);
+    };
+
+    const waitPendingWrites = async () => {
+      const jobs = pendingWrites.value.slice();
+      if (jobs.length) await Promise.allSettled(jobs);
+    };
+
+    const waitLocalWrites = async () => {
+      if (localWriteCount.value <= 0) return;
+
+      await new Promise((resolve) => {
+        const check = () => {
+          if (localWriteCount.value <= 0) resolve();
+          else setTimeout(check, 100);
+        };
+        check();
+      });
+    };
+
+    const postJSON = async (payload) => {
+      const p = { ...payload };
+      if (p.data && typeof p.data === 'object') p.data = JSON.stringify(p.data);
+      return await trackWrite(apiGet(p));
+    };
+
+    const saveTripsCache = () => {
+      try {
+        localStorage.setItem('trips_cache', JSON.stringify({
+          ts: Date.now(),
+          data: trips.value
+        }));
+      } catch(e) {}
+    };
+
+    const loadTripsCache = () => {
+      try {
+        const raw = localStorage.getItem('trips_cache');
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        trips.value = Array.isArray(parsed?.data) ? parsed.data : [];
+        return trips.value.length > 0;
+      } catch(e) {
+        return false;
+      }
+    };
+
+    let tripCacheSaveTimer = null;
+    const scheduleTripCacheSave = () => {
+      if (!currentTrip.value?.id) return;
+      clearTimeout(tripCacheSaveTimer);
+      tripCacheSaveTimer = setTimeout(() => {
+        saveTripCache(currentTrip.value.id);
+      }, 250);
+    };
+
+    let tripsCacheSaveTimer = null;
+    const scheduleTripsCacheSave = () => {
+      clearTimeout(tripsCacheSaveTimer);
+      tripsCacheSaveTimer = setTimeout(() => {
+        saveTripsCache();
+      }, 250);
+    };
+
+    const setOrderIds = (tripId, day, ids) => {
+      applyOrderToLocalItinerary(day, ids);
+      scheduleTripCacheSave();
+    };
+    const getOrderIds = (tripId, day) => getDayOrderedItems(day).map(item => String(item.id));
+    const clearOrderIds = (tripId, day) => {
+      const targetDay = parseInt(day, 10) || 1;
+      itinerary.value.forEach((item) => {
+        if ((item.day ? parseInt(item.day,10) : 1) === targetDay) {
+          item.order = null;
+        }
+      });
+      scheduleTripCacheSave();
+    };
+
+    const saveOrderToDB = async (tripId, day, ids) => {
+      await postJSON({ action: 'save_order', tripId, day: String(day), order: (ids||[]).join(',') });
+    };
+
+    const escapeHtml = (s) => String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#39;");
+
+    const linkifyMessage = (text) => {
+      const raw = String(text || '');
+      if (!raw) return '';
+
+      const escaped = escapeHtml(raw);
+      const urlRegex = /(https?:\/\/[^\s<]+[^\s<.,!?;:])/gi;
+
+      const linked = escaped.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+      });
+
+      return `📝 ${linked.replace(/\n/g, '<br>')}`;
+    };
+
+    const handleItineraryContentClick = (event, place) => {
+      if (event?.target?.closest && event.target.closest('a')) return;
+      openExternalMap(place);
+    };
+
+    const loadGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        try { autocompleteService = new google.maps.places.AutocompleteService(); } catch(e){}
+        isMapReady.value = true;
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve) => {
+        const existed = document.querySelector('script[data-google-maps-loader="1"]');
+        if (existed) {
+          const timer = setInterval(() => {
+            if (window.google && window.google.maps) {
+              clearInterval(timer);
+              try { autocompleteService = new google.maps.places.AutocompleteService(); } catch(e){}
+              isMapReady.value = true;
+              resolve();
+            }
+          }, 100);
+          return;
+        }
+
+        const s = document.createElement('script');
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&language=zh-TW`;
+        s.async = true;
+        s.defer = true;
+        s.setAttribute('data-google-maps-loader', '1');
+
+        s.onload = () => {
+          try { autocompleteService = new google.maps.places.AutocompleteService(); } catch(e){}
+          isMapReady.value = true;
+          resolve();
+        };
+
+        s.onerror = () => resolve();
+        document.head.appendChild(s);
+      });
+    };
+
+    const getPlaceDetails = (placeId, language = 'zh-TW') => {
+      return new Promise(async (resolve) => {
+        if (!window.google || !window.google.maps) {
+          await loadGoogleMaps();
+        }
+
+        const dummyMap = new google.maps.Map(document.createElement('div'));
+        const service = new google.maps.places.PlacesService(dummyMap);
+
+        service.getDetails(
+          {
+            placeId,
+            fields: ['place_id', 'name', 'formatted_address', 'geometry'],
+            language
+          },
+          (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+              resolve(place);
+            } else {
+              resolve(null);
+            }
+          }
+        );
+      });
+    };
+
+    const initGoogleMap = () => {
+      if (!window.google || !window.google.maps) return;
+
+      const mapEl = document.getElementById('map');
+      if (!mapEl) return;
+
+      const needRecreate = !mapInstance || mapElementRef !== mapEl;
+
+      if (needRecreate) {
+        mapElementRef = mapEl;
+
+        mapInstance = new google.maps.Map(mapEl, {
+          center: { lat: 23.6, lng: 121 },
+          zoom: 8,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false
+        });
+
+        infoWindow = new google.maps.InfoWindow();
+      }
+
+      updateMapMarkers();
+    };
+
+    const clearMapSearchMarker = () => {
+      if (mapSearchMarker) {
+        mapSearchMarker.setMap(null);
+        mapSearchMarker = null;
+      }
+    };
+
+    const clearMapSearchResult = () => {
+      clearMapSearchDropdown();
+      clearMapSearchMarker();
+      mapLatestResult.value = null;
+      if (infoWindow) infoWindow.close();
+      if (currentTab.value === 'map') updateMapMarkers();
+    };
+
+    const clearMapRouteLine = () => {
+      if (mapRouteLine) {
+        mapRouteLine.setMap(null);
+        mapRouteLine = null;
+      }
+    };
+
+    const clearMapSearchDropdown = () => {
+      mapSearchResults.value = [];
+      mapIsSearching.value = false;
+      mapIsCoordinateMode.value = false;
+      mapResolvedCoordName.value = '';
+      mapSelectedLat.value = null;
+      mapSelectedLng.value = null;
+      mapSelectedPlaceData.value = null;
+    };
+
+    const getExternalMapLink = ({ name = '', lat = null, lng = null, place_id = '' }) => {
+      if (place_id) {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${place_id}`;
+      }
+      if (lat != null && lng != null) {
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      }
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+    };
+
+    const openHotelMap = (hotel) => {
+      if (!hotel) return;
+
+      const name = String(hotel.name || '住宿').trim() || '住宿';
+      const address = String(hotel.address || '').trim();
+      const lat = hotel.lat != null && hotel.lat !== '' ? Number(hotel.lat) : null;
+      const lng = hotel.lng != null && hotel.lng !== '' ? Number(hotel.lng) : null;
+      const queryText = [name, address].filter(Boolean).join(' ');
+      const query = encodeURIComponent(queryText || name);
+
+      if (isKoreaTrip.value) {
+        if (hotel.naver_url) {
+          window.open(hotel.naver_url, '_blank');
+          return;
+        }
+
+        const naverWebSearch = `https://map.naver.com/v5/search/${query}`;
+
+        if (lat && lng) {
+          const naverAppLink = `nmap://place?lat=${lat}&lng=${lng}&name=${encodeURIComponent(name)}&appname=tripplanner`;
+          window.location.href = naverAppLink;
+
+          setTimeout(() => {
+            window.open(naverWebSearch, '_blank');
+          }, 1200);
+          return;
+        }
+
+        window.open(naverWebSearch, '_blank');
+        return;
+      }
+
+      if (hotel.place_id) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${hotel.place_id}`, '_blank');
+        return;
+      }
+
+      if (lat && lng) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+        return;
+      }
+
+      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+    };
+
+    const getMapDisplayDay = () => {
+      const raw = String(mapDisplayFilter.value || 'all');
+      if (!raw.startsWith('day-')) return null;
+      const day = parseInt(raw.replace('day-', ''), 10);
+      return Number.isFinite(day) && day > 0 ? day : null;
+    };
+
+    const applyMapDisplayFilter = () => {
+      const day = getMapDisplayDay();
+      if (day) {
+        currentDay.value = day;
+        mapAddDay.value = day;
+      }
+      updateMapMarkers();
+    };
+
+    const showSearchResultOnMap = ({ name = '', address = '', lat = null, lng = null, place_id = '' }) => {
+      if (!mapInstance || !window.google || lat == null || lng == null) return;
+
+      clearMapSearchMarker();
+
+      mapLatestResult.value = {
+        name: name || '搜尋結果',
+        address: address || '',
+        lat: Number(lat),
+        lng: Number(lng),
+        place_id: place_id || ''
+      };
+
+      mapSearchMarker = new google.maps.Marker({
+        position: { lat: Number(lat), lng: Number(lng) },
+        map: mapInstance,
+        title: name || '搜尋結果',
+        label: { text: '搜', color: 'white' },
+        zIndex: 999
+      });
+
+      const openInfo = () => {
+        const link = getExternalMapLink({ name, lat, lng, place_id });
+        infoWindow.setContent(
+          `<div style="padding:6px; color:#111; max-width:220px;">
+            <b>${escapeHtml(name || '搜尋結果')}</b><br/>
+            <span style="font-size:12px; color:#555">${escapeHtml(address || '')}</span><br/>
+            <a href="${link}" target="_blank" style="color:#2563eb;">Google Maps</a>
+          </div>`
+        );
+        infoWindow.open(mapInstance, mapSearchMarker);
+      };
+
+      mapSearchMarker.addListener('click', openInfo);
+      mapInstance.setCenter({ lat: Number(lat), lng: Number(lng) });
+      mapInstance.setZoom(15);
+      openInfo();
+    };
+
+    const updateMapMarkers = () => {
+      if (!mapInstance || !window.google) return;
+
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+      clearMapRouteLine();
+
+      const displayDay = getMapDisplayDay();
+      let itemsToRender = itinerary.value.filter(item => item.lat && item.lng);
+
+      if (displayDay) {
+        itemsToRender = itemsToRender.filter(item => (item.day ? parseInt(item.day,10) : 1) === displayDay);
+      }
+
+      const bounds = new google.maps.LatLngBounds();
+      let hasPoint = false;
+
+      itemsToRender.forEach(item => {
+        const d = item.day ? parseInt(item.day,10) : 1;
+
+        const marker = new google.maps.Marker({
+          position: { lat: Number(item.lat), lng: Number(item.lng) },
+          map: mapInstance,
+          label: { text: d.toString(), color: "white" },
+          title: item.name
+        });
+
+        marker.addListener("click", () => {
+          const link = item.place_id
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}&query_place_id=${item.place_id}`
+            : `https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lng}`;
+
+          infoWindow.setContent(
+            `<div style="padding:6px; color:#111">
+              <b>${escapeHtml(item.name || '')}</b><br/>
+              <span style="font-size:12px; color:#555">${escapeHtml(formatTime(item.time)||'')} ${escapeHtml(item.message||'')}</span><br/>
+              <a href="${link}" target="_blank" style="color:#2563eb;">Google Maps</a>
+            </div>`
+          );
+          infoWindow.open(mapInstance, marker);
+        });
+
+        markers.push(marker);
+        bounds.extend(marker.getPosition());
+        hasPoint = true;
+      });
+
+
+      let hotelsToRender = hotels.value.filter(hotel => hotel.lat != null && hotel.lng != null);
+      if (displayDay) {
+        hotelsToRender = hotelsToRender.filter(hotel => isHotelActiveOnDay(hotel, displayDay));
+      }
+
+      hotelsToRender.forEach(hotel => {
+        const marker = new google.maps.Marker({
+          position: { lat: Number(hotel.lat), lng: Number(hotel.lng) },
+          map: mapInstance,
+          label: { text: '🏨', fontSize: '16px' },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 17,
+            fillColor: '#7c3aed',
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2
+          },
+          zIndex: 900,
+          title: hotel.name || '住宿'
+        });
+
+        marker.addListener('click', () => {
+          const safeId = String(hotel.id || Math.random())
+            .replace(/[^a-zA-Z0-9_-]/g, '')
+            .slice(0, 40);
+          const buttonId = `hotel-map-${safeId}`;
+          const mapLabel = isKoreaTrip.value ? '開啟 Naver Map' : '開啟 Google Maps';
+
+          infoWindow.setContent(
+            `<div style="padding:8px; color:#111; max-width:230px; line-height:1.45;">
+              <div style="font-weight:700; margin-bottom:4px;">🏨 ${escapeHtml(hotel.name || '住宿')}</div>
+              <div style="font-size:12px; color:#555; margin-bottom:3px;">${escapeHtml(hotelDayRangeLabel(hotel))}</div>
+              <div style="font-size:12px; color:#555; margin-bottom:8px; word-break:break-word;">${escapeHtml(hotel.address || '')}</div>
+              <button
+                id="${buttonId}"
+                style="background:#2563eb;color:white;border:0;border-radius:8px;padding:7px 10px;font-weight:700;cursor:pointer;width:100%;"
+              >${mapLabel}</button>
+            </div>`
+          );
+          infoWindow.open(mapInstance, marker);
+
+          google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+            const btn = document.getElementById(buttonId);
+            if (btn) btn.onclick = () => openHotelMap(hotel);
+          });
+        });
+
+        markers.push(marker);
+        bounds.extend(marker.getPosition());
+        hasPoint = true;
+      });
+
+      const routeItems = itemsToRender.slice().sort((a, b) => {
+        const dayDiff = (a.day ? parseInt(a.day,10) : 1) - (b.day ? parseInt(b.day,10) : 1);
+        if (dayDiff !== 0) return dayDiff;
+        return timeToNum(a.time) - timeToNum(b.time);
+      });
+
+      if (routeItems.length >= 2) {
+        mapRouteLine = new google.maps.Polyline({
+          path: routeItems.map(item => ({ lat: Number(item.lat), lng: Number(item.lng) })),
+          map: mapInstance,
+          strokeColor: '#2563eb',
+          strokeOpacity: 0.65,
+          strokeWeight: 3
+        });
+      }
+
+      if (!hasPoint && mapLatestResult.value) {
+        hasPoint = true;
+        bounds.extend({ lat: Number(mapLatestResult.value.lat), lng: Number(mapLatestResult.value.lng) });
+      }
+
+      if (hasPoint) {
+        mapInstance.fitBounds(bounds);
+      } else if (currentTrip.value?.city && window.google) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: currentTrip.value.city }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            mapInstance.setCenter(results[0].geometry.location);
+            mapInstance.setZoom(12);
+          }
+        });
+      }
+    };
+
+    const fitBoundsToTrip = () => {
+      updateMapMarkers();
+    };
+
+    const addMapSearchResultToItinerary = async () => {
+      if (isAddingMapPlace.value) return;
+      if (!currentTrip.value || !mapLatestResult.value) return;
+
+      isAddingMapPlace.value = true;
+      setTimeout(() => {
+        isAddingMapPlace.value = false;
+      }, 500);
+      beginLocalWrite();
+
+      const id = generateId();
+      const d = mapAddDay.value || currentDay.value || 1;
+      const item = {
+        id,
+        name: mapLatestResult.value.name || mapSearchQuery.value || '搜尋結果',
+        name_ko: '',
+        address: mapLatestResult.value.address || '',
+        day: d,
+        lat: Number(mapLatestResult.value.lat),
+        lng: Number(mapLatestResult.value.lng),
+        place_id: mapLatestResult.value.place_id || '',
+        message: '',
+        time: '',
+        trip_id: currentTrip.value.id
+      };
+
+      const oldIds = getOrderIds(currentTrip.value.id, d).filter(x => String(x) !== String(id));
+      const ids = oldIds.slice();
+      ids.push(String(id));
+
+      itinerary.value.push(item);
+      setOrderIds(currentTrip.value.id, d, ids);
+      currentDay.value = d;
+      mapDisplayFilter.value = `day-${d}`;
+      clearMapSearchResult();
+
+      await nextTick();
+      scheduleSortableInit();
+      updateMapMarkers();
+      scheduleTripCacheSave();
+
+      try {
+        const res = await postJSON({ action:'add', type:'itinerary', data: item });
+        if (res && res.status === 'error') {
+          throw new Error(res.message || 'add itinerary failed');
+        }
+        await saveOrderToDB(currentTrip.value.id, d, ids);
+      } catch (err) {
+        console.error('add map itinerary sync failed:', err);
+
+        const idx = itinerary.value.findIndex(x => String(x.id) === String(id));
+        if (idx !== -1) itinerary.value.splice(idx, 1);
+
+        const rollbackIds = getOrderIds(currentTrip.value.id, d).filter(x => String(x) !== String(id));
+        setOrderIds(currentTrip.value.id, d, rollbackIds);
+        try { await saveOrderToDB(currentTrip.value.id, d, rollbackIds); } catch(e) {}
+
+        await nextTick();
+        scheduleSortableInit();
+        updateMapMarkers();
+        scheduleTripCacheSave();
+
+        alert('行程新增失敗，已取消剛剛新增的資料，請稍後再試。');
+      } finally {
+        endLocalWrite();
+      }
+    };
+
+    const searchMapPlacesInput = async () => {
+      const q = mapSearchQuery.value.trim();
+
+      if (!q) {
+        clearMapSearchResult();
+        return;
+      }
+
+      const coordRegex = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/;
+      if (coordRegex.test(q)) {
+        mapIsCoordinateMode.value = true;
+        mapIsSearching.value = false;
+        const parts = q.split(',');
+        mapSelectedLat.value = parseFloat(parts[0]);
+        mapSelectedLng.value = parseFloat(parts[1]);
+        mapResolvedCoordName.value = `座標 ${parts[0].trim()}, ${parts[1].trim()}`;
+        mapSearchResults.value = [];
+        mapSelectedPlaceData.value = null;
+        return;
+      }
+
+      mapIsCoordinateMode.value = false;
+      mapSelectedLat.value = null;
+      mapSelectedLng.value = null;
+      mapResolvedCoordName.value = '';
+      mapSelectedPlaceData.value = null;
+      mapIsSearching.value = true;
+
+      if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
+
+      mapSearchTimeout = setTimeout(async () => {
+        try {
+          if (!window.google || !window.google.maps) {
+            await loadGoogleMaps();
+          }
+
+          if (!autocompleteService) {
+            autocompleteService = new google.maps.places.AutocompleteService();
+          }
+
+          const req = { input: q, language: 'zh-TW' };
+          if (mapInstance && typeof mapInstance.getBounds === 'function') {
+            const bounds = mapInstance.getBounds();
+            if (bounds) req.bounds = bounds;
+          }
+
+          autocompleteService.getPlacePredictions(req, (predictions, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+              mapSearchResults.value = predictions;
+            } else {
+              mapSearchResults.value = [];
+            }
+            mapIsSearching.value = false;
+          });
+        } catch (err) {
+          console.error(err);
+          mapSearchResults.value = [];
+          mapIsSearching.value = false;
+        }
+      }, 250);
+    };
+
+    const useMapCoordinateInput = async () => {
+      await searchCityAndJump();
+    };
+
+    const selectMapPlace = async (item) => {
+      mapSearchQuery.value = item.description || item.structured_formatting?.main_text || '';
+      mapSelectedPlaceData.value = item;
+      mapSearchResults.value = [];
+      mapIsSearching.value = false;
+      mapIsCoordinateMode.value = false;
+      await searchCityAndJump();
+    };
+
+    const searchMapInExternalMap = () => {
+      const query = mapSearchQuery.value.trim();
+      if (!query) return;
+
+      if (isKoreaTrip.value) {
+        window.open(`https://map.naver.com/v5/search/${encodeURIComponent(query)}`, '_blank');
+      } else {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+      }
+    };
+
+    const searchCityAndJump = async () => {
+      const q = mapSearchQuery.value.trim();
+      if (!q) {
+        clearMapSearchResult();
+        return;
+      }
+
+      if (!window.google || !window.google.maps) {
+        await loadGoogleMaps();
+      }
+      if (!mapInstance) {
+        initGoogleMap();
+      }
+      if (!window.google || !mapInstance) return;
+
+      if (mapIsCoordinateMode.value && mapSelectedLat.value != null && mapSelectedLng.value != null) {
+        showSearchResultOnMap({
+          name: mapResolvedCoordName.value || q,
+          address: '座標搜尋',
+          lat: mapSelectedLat.value,
+          lng: mapSelectedLng.value,
+          place_id: ''
+        });
+        mapSearchResults.value = [];
+        return;
+      }
+
+      if (mapSelectedPlaceData.value?.place_id) {
+        const place = await getPlaceDetails(mapSelectedPlaceData.value.place_id, 'zh-TW');
+        if (place?.geometry?.location) {
+          showSearchResultOnMap({
+            name: place.name || q,
+            address: place.formatted_address || '',
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+            place_id: mapSelectedPlaceData.value.place_id
+          });
+          mapSearchResults.value = [];
+          return;
+        }
+      }
+
+      const geocoder = new google.maps.Geocoder();
+      const city = String(currentTrip.value?.city || '').trim();
+      const geocodeQuery = city && !q.includes(city) ? `${q} ${city}` : q;
+
+      geocoder.geocode({ address: geocodeQuery }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          const r = results[0];
+          showSearchResultOnMap({
+            name: r.address_components?.[0]?.long_name || q,
+            address: r.formatted_address || geocodeQuery,
+            lat: r.geometry.location.lat(),
+            lng: r.geometry.location.lng(),
+            place_id: r.place_id || ''
+          });
+          mapSearchResults.value = [];
+          return;
+        }
+        alert('找不到這個地點');
+      });
+    };
+
+    const fetchTrips = async () => {
+      const t0 = performance.now();
+      isLoading.value = true;
+      try {
+        const t_api0 = performance.now();
+        const data = await apiGet({ type: 'trips' });
+        const t_api1 = performance.now();
+
+        console.log('fetchTrips api ms =', Math.round(t_api1 - t_api0), data);
+
+        trips.value = Array.isArray(data) ? data : [];
+        saveTripsCache();
+
+        const t_assign = performance.now();
+        console.log('fetchTrips assign ms =', Math.round(t_assign - t_api1));
+      } catch (err) {
+        console.error('fetchTrips failed:', err);
+      } finally {
+        console.log('fetchTrips total ms =', Math.round(performance.now() - t0));
+        isLoading.value = false;
+      }
+    };
+
+    const createTrip = async () => {
+      const name = newTripName.value.trim();
+      if(!name) return;
+
+      const id = generateId();
+      const newTrip = {
+        id,
+        name,
+        city: newTripCity.value.trim() || '',
+        start_date: ''
+      };
+
+      trips.value.push(newTrip);
+      newTripName.value = '';
+      newTripCity.value = '';
+
+      await postJSON({ action: 'add', type: 'trips', data: newTrip });
+    };
+
+    const selectTrip = async (trip) => {
+      if(!trip) return;
+
+      currentTrip.value = trip;
+
+      itinerary.value = [];
+      expenses.value = [];
+      people.value = [];
+      hotels.value = [];
+      hotelSearchQuery.value = '';
+      hotelSearchResults.value = [];
+      hotelSelectedPlaceData.value = null;
+      newHotel.value = { start_day: 1, end_day: 1 };
+      currentDay.value = 1;
+      totalDays.value = 1;
+      mapSearchQuery.value = '';
+      mapAddDay.value = 1;
+      mapDisplayFilter.value = 'all';
+      clearMapSearchResult();
+
+      currentView.value = 'app';
+      startAutoSync();
+
+      const tripId = trip.id;
+      loadTripCache(tripId);
+
+      await nextTick();
+      scheduleSortableInit();
+
+      if (currentTab.value === 'map') {
+        await loadGoogleMaps();
+        initGoogleMap();
+      } else {
+        updateMapMarkers();
+      }
+
+      fetchData();
+    };
+
+    const exitTrip = () => {
+      stopAutoSync();
+      currentView.value = 'lobby';
+      currentTrip.value = null;
+      mapSearchQuery.value = '';
+      mapDisplayFilter.value = 'all';
+      clearMapSearchResult();
+      fetchTrips();
+    };
+
+    const deleteTripTotally = async () => {
+      if(!confirm('確定刪除此旅程？此操作無法復原。')) return;
+      await postJSON({ action: 'del', type: 'trips', id: currentTrip.value.id });
+      exitTrip();
+      await fetchTrips();
+    };
+
+    const fetchData = async (force = false, options = {}) => {
+      if(!currentTrip.value) return;
+
+      const tripId = currentTrip.value.id;
+      const t_start = performance.now();
+      const silent = options.silent === true;
+
+      if (!silent) {
+        isLoading.value = true;
+      }
+
+      try {
+        const t_api_start = performance.now();
+        const params = {
+          type: 'tripData',
+          tripId,
+          _ts: Date.now()
+        };
+
+        if (force) {
+          params.force = '1';
+        }
+
+        const data = await apiGet(params);
+        const t_api_end = performance.now();
+
+        console.log("tripData response ms =", Math.round(t_api_end - t_api_start), data);
+
+        const trip = data?.trip || null;
+        const itin = Array.isArray(data?.itinerary) ? data.itinerary : [];
+        const exp  = Array.isArray(data?.expenses) ? data.expenses : [];
+        const ppl  = Array.isArray(data?.people) ? data.people : [];
+        const htl  = Array.isArray(data?.hotels) ? data.hotels : [];
+
+        itinerary.value = itin.map(normalizeItineraryRecord);
+        expenses.value = exp.map(normalizeExpenseRecord);
+        people.value = ppl.length ? ppl : [{id:'default', name:'我'}];
+        hotels.value = htl.map(normalizeHotelRecord);
+
+        if (trip) {
+          currentTrip.value = { ...currentTrip.value, ...trip };
+        }
+
+        const maxDay = itinerary.value.reduce((m, it) =>
+          Math.max(m, it.day ? parseInt(it.day,10) : 1), 1);
+
+        totalDays.value = Math.max(1, maxDay);
+
+        await ensureAllDayOrdersSynced(tripId);
+
+        await nextTick();
+        scheduleSortableInit();
+
+        if (currentTab.value === 'map') {
+          await loadGoogleMaps();
+          initGoogleMap();
+          setTimeout(() => {
+            if (mapInstance && window.google) {
+              google.maps.event.trigger(mapInstance, 'resize');
+              updateMapMarkers();
+            }
+          }, 100);
+        } else {
+          updateMapMarkers();
+        }
+
+        saveTripCache(tripId);
+      } finally {
+        console.log("fetchData total ms =", Math.round(performance.now() - t_start));
+        if (!silent) {
+          isLoading.value = false;
+        }
+      }
+    };
+
+    const isUserEditingNow = () => {
+      const el = document.activeElement;
+      if (!el) return false;
+
+      const tag = String(el.tagName || '').toUpperCase();
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    };
+
+    const canAutoSync = () => {
+      if (currentView.value !== 'app') return false;
+      if (!currentTrip.value?.id) return false;
+      if (document.visibilityState !== 'visible') return false;
+      if (isLoading.value) return false;
+      if (isAutoSyncing.value) return false;
+      if (pendingWrites.value.length > 0) return false;
+      if (localWriteCount.value > 0) return false;
+      if (isUserEditingNow()) return false;
+      if (showDayModal.value) return false;
+      if (showEditModal.value) return false;
+      if (showEditExpenseModal.value) return false;
+      return true;
+    };
+
+    const autoSyncNow = async () => {
+      if (!canAutoSync()) return;
+
+      isAutoSyncing.value = true;
+      try {
+        await fetchData(true, { silent: true });
+      } catch (err) {
+        console.warn('auto sync failed:', err);
+      } finally {
+        isAutoSyncing.value = false;
+      }
+    };
+
+    const startAutoSync = () => {
+      stopAutoSync();
+      autoSyncTimer = setInterval(() => {
+        autoSyncNow();
+      }, AUTO_SYNC_INTERVAL_MS);
+    };
+
+    const stopAutoSync = () => {
+      if (autoSyncTimer) {
+        clearInterval(autoSyncTimer);
+        autoSyncTimer = null;
+      }
+    };
+
+    const manualSync = async () => {
+      if (!currentTrip.value || isLoading.value) return;
+
+      try {
+        await waitLocalWrites();
+        await waitPendingWrites();
+        await fetchData(true, { silent: false });
+      } catch (err) {
+        console.error('manualSync failed:', err);
+        alert('同步失敗，請稍後再試');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        autoSyncNow();
+      }
+    };
+
+    const onDayClick = async (d) => {
+      currentDay.value = d;
+      await nextTick();
+      scheduleSortableInit();
+    };
+
+    const onDayDblClick = (d) => {
+      modalDay.value = d;
+      if (d === 1) {
+        const base = parseYMD(currentTrip.value?.start_date);
+        dateInput.value = toYMD(base || new Date());
+      }
+      swapTargetDay.value = 0;
+      showDayModal.value = true;
+    };
+
+    const closeDayModal = () => {
+      showDayModal.value = false;
+    };
+
+    const applyDay1Date = async () => {
+      const pick = parseYMD(dateInput.value);
+      if (!pick || !currentTrip.value) {
+        showDayModal.value = false;
+        return;
+      }
+
+      const ymd = toYMD(pick);
+      currentTrip.value.start_date = ymd;
+
+      const idx = trips.value.findIndex(t => String(t.id) === String(currentTrip.value.id));
+      if (idx !== -1) trips.value[idx].start_date = ymd;
+
+      isLoading.value = true;
+      try {
+        await postJSON({ action:'set_trip_start_date', type:'trips', tripId: currentTrip.value.id, start_date: ymd });
+      } finally {
+        isLoading.value = false;
+        showDayModal.value = false;
+      }
+    };
+
+    const swapWithDay = async () => {
+      if (!currentTrip.value) return;
+
+      const dayA = parseInt(modalDay.value, 10);
+      const dayB = parseInt(swapTargetDay.value, 10);
+      if (!dayA || !dayB || dayA === dayB) return;
+
+      isLoading.value = true;
+      try {
+        await postJSON({ action:'swap_days', tripId: currentTrip.value.id, dayA: String(dayA), dayB: String(dayB) });
+
+        const tripId = currentTrip.value.id;
+        const oA = getOrderIds(tripId, dayA);
+        const oB = getOrderIds(tripId, dayB);
+
+        if (oB) {
+          await saveOrderToDB(tripId, dayA, oB);
+        } else {
+          await postJSON({ action:'clear_order', tripId, day: String(dayA) });
+        }
+
+        if (oA) {
+          await saveOrderToDB(tripId, dayB, oA);
+        } else {
+          await postJSON({ action:'clear_order', tripId, day: String(dayB) });
+        }
+
+        await fetchData();
+        currentDay.value = dayA;
+      } finally {
+        isLoading.value = false;
+        showDayModal.value = false;
+      }
+    };
+
+    const addNewDay = () => {
+      totalDays.value++;
+      currentDay.value = totalDays.value;
+      scheduleSortableInit();
+    };
+
+    const deleteDay = async (d) => {
+      if (!currentTrip.value) return;
+      if (!confirm(`刪除 Day ${d} 的所有行程？`)) return;
+
+      isLoading.value = true;
+      try {
+        const tripId = currentTrip.value.id;
+
+        const toDelete = itinerary.value.filter(it => (it.day ? parseInt(it.day,10) : 1) === d);
+        for (const it of toDelete) {
+          await postJSON({ action:'del', type:'itinerary', id: it.id });
+        }
+        itinerary.value = itinerary.value.filter(it => (it.day ? parseInt(it.day,10) : 1) !== d);
+
+        const toShift = itinerary.value.filter(it => (it.day ? parseInt(it.day,10) : 1) > d);
+        for (const it of toShift) {
+          const newDay = (it.day ? parseInt(it.day,10) : 1) - 1;
+          it.day = newDay;
+          await postJSON({ action:'edit', type:'itinerary', data: { id: it.id, day: newDay, trip_id: tripId }});
+        }
+
+        await postJSON({ action:'clear_order', tripId, day: String(d) });
+
+        for (let day = d; day <= totalDays.value - 1; day++) {
+          const ids = getOrderIds(tripId, day);
+          if (ids.length) {
+            await saveOrderToDB(tripId, day, ids);
+          } else {
+            await postJSON({ action:'clear_order', tripId, day: String(day) });
+          }
+        }
+
+        await postJSON({ action:'clear_order', tripId, day: String(totalDays.value) });
+
+        totalDays.value = Math.max(1, totalDays.value - 1);
+        if (currentDay.value > totalDays.value) currentDay.value = totalDays.value;
+
+        await nextTick();
+        scheduleSortableInit();
+        updateMapMarkers();
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    const destroySortable = () => {
+      if (sortable) {
+        sortable.destroy();
+        sortable = null;
+      }
+    };
+
+    let lastSortableSignature = '';
+    const initSortable = () => {
+      if (!itineraryListEl.value) {
+        destroySortable();
+        return;
+      }
+      if (currentTab.value !== 'itinerary' || !currentTrip.value) {
+        destroySortable();
+        return;
+      }
+
+      const currentIds = Array.from(itineraryListEl.value.querySelectorAll('[data-id]'))
+        .map(el => el.getAttribute('data-id'))
+        .filter(Boolean)
+        .join('|');
+      const signature = `${currentTrip.value.id}__${currentDay.value}__${currentIds}`;
+
+      if (sortable && lastSortableSignature === signature) return;
+
+      destroySortable();
+      lastSortableSignature = signature;
+
+      sortable = new Sortable(itineraryListEl.value, {
+        animation: 150,
+        handle: '.drag-handle',
+        ghostClass: 'opacity-50',
+        onEnd: async () => {
+          const ids = Array.from(itineraryListEl.value.querySelectorAll('[data-id]'))
+            .map(el => el.getAttribute('data-id'))
+            .filter(Boolean);
+          setOrderIds(currentTrip.value.id, currentDay.value, ids);
+          try { await saveOrderToDB(currentTrip.value.id, currentDay.value, ids); } catch(e){}
+          scheduleTripCacheSave();
+          lastSortableSignature = `${currentTrip.value.id}__${currentDay.value}__${ids.join('|')}`;
+        }
+      });
+    };
+
+    let sortableInitTimer = null;
+    const scheduleSortableInit = () => {
+      clearTimeout(sortableInitTimer);
+      sortableInitTimer = setTimeout(async () => {
+        await nextTick();
+        initSortable();
+      }, 30);
+    };
+
+    const filteredItinerary = computed(() => getDayOrderedItems(currentDay.value));
+
+    const formatDurationSeconds = (seconds) => {
+      const totalMinutes = Math.round((Number(seconds) || 0) / 60);
+      if (totalMinutes <= 0) return '0 分鐘';
+
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+
+      if (h > 0 && m > 0) return `${h} 小時 ${m} 分鐘`;
+      if (h > 0) return `${h} 小時`;
+      return `${m} 分鐘`;
+    };
+
+    const routeTotalText = computed(() => formatDurationSeconds(routeTotalSeconds.value));
+
+    const clearRouteResults = () => {
+      routeSegments.value = [];
+      routeTotalSeconds.value = 0;
+      routeError.value = '';
+    };
+
+    const getRouteStatusText = (status) => {
+      const map = {
+        ZERO_RESULTS: '找不到可用路線',
+        OVER_QUERY_LIMIT: 'API 使用量暫時超過限制',
+        REQUEST_DENIED: 'Google Directions 權限未啟用或被拒絕',
+        INVALID_REQUEST: '路線請求格式不正確',
+        UNKNOWN_ERROR: 'Google 服務暫時錯誤'
+      };
+      return map[String(status || '')] || String(status || '無法計算');
+    };
+
+    const requestDirections = (service, request) => new Promise((resolve, reject) => {
+      service.route(request, (response, status) => {
+        if (status === 'OK') resolve(response);
+        else reject(new Error(getRouteStatusText(status)));
+      });
+    });
+
+    const testDayRoutes = async () => {
+      if (!currentTrip.value) return;
+
+      const points = filteredItinerary.value
+        .filter(p => p.lat && p.lng && !Number.isNaN(Number(p.lat)) && !Number.isNaN(Number(p.lng)))
+        .map(p => ({
+          id: p.id,
+          name: String(p.name || '未命名地點'),
+          lat: Number(p.lat),
+          lng: Number(p.lng)
+        }));
+
+      clearRouteResults();
+
+      if (points.length < 2) {
+        routeError.value = '目前 Day 至少需要 2 個有座標的行程點，才能測試交通時間。';
+        return;
+      }
+
+      isRouteLoading.value = true;
+
+      try {
+        await loadGoogleMaps();
+
+        if (!window.google || !google.maps || !google.maps.DirectionsService) {
+          throw new Error('Google DirectionsService 尚未載入');
+        }
+
+        const service = new google.maps.DirectionsService();
+        const mode = google.maps.TravelMode[routeTravelMode.value] || google.maps.TravelMode.TRANSIT;
+        const results = [];
+        let totalSeconds = 0;
+        let failedCount = 0;
+
+        for (let i = 0; i < points.length - 1; i++) {
+          const from = points[i];
+          const to = points[i + 1];
+
+          const request = {
+            origin: { lat: from.lat, lng: from.lng },
+            destination: { lat: to.lat, lng: to.lng },
+            travelMode: mode,
+            provideRouteAlternatives: false
+          };
+
+          if (routeTravelMode.value === 'TRANSIT') {
+            request.transitOptions = { departureTime: new Date() };
+          }
+
+          try {
+            const response = await requestDirections(service, request);
+            const route = response.routes && response.routes[0];
+            const leg = route && route.legs && route.legs[0];
+
+            if (!leg) throw new Error('無路線資料');
+
+            const durationSeconds = leg.duration?.value || 0;
+            totalSeconds += durationSeconds;
+
+            results.push({
+              key: `${from.id}_${to.id}_${routeTravelMode.value}`,
+              from: from.name,
+              to: to.name,
+              duration: leg.duration?.text || formatDurationSeconds(durationSeconds),
+              distance: leg.distance?.text || '-'
+            });
+          } catch (segErr) {
+            failedCount++;
+            results.push({
+              key: `${from.id}_${to.id}_${routeTravelMode.value}_failed`,
+              from: from.name,
+              to: to.name,
+              duration: '無法計算',
+              distance: '-'
+            });
+            console.warn('route segment failed:', from.name, to.name, segErr);
+          }
+        }
+
+        routeSegments.value = results;
+        routeTotalSeconds.value = totalSeconds;
+
+        if (failedCount > 0) {
+          routeError.value = `有 ${failedCount} 段路線無法計算，可嘗試切換交通方式。`;
+        }
+      } catch (err) {
+        console.error('testDayRoutes failed:', err);
+        routeError.value = '交通時間計算失敗，請確認 Google Maps Directions API 是否可用。';
+      } finally {
+        isRouteLoading.value = false;
+      }
+    };
+
+    let searchTimeout = null;
+
+    const searchPlacesInput = async () => {
+      const q = newPlace.value.trim();
+
+      if (!q) {
+        searchResults.value = [];
+        isCoordinateMode.value = false;
+        isSearching.value = false;
+        return;
+      }
+
+      const coordRegex = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/;
+      if (coordRegex.test(q)) {
+        isCoordinateMode.value = true;
+        isSearching.value = false;
+
+        const parts = q.split(',');
+        selectedLat.value = parseFloat(parts[0]);
+        selectedLng.value = parseFloat(parts[1]);
+        resolvedCoordName.value = '座標';
+        return;
+      } else {
+        isCoordinateMode.value = false;
+        selectedLat.value = null;
+        selectedLng.value = null;
+        resolvedCoordName.value = '';
+      }
+
+      selectedPlaceData.value = null;
+      isSearching.value = true;
+
+      if (searchTimeout) clearTimeout(searchTimeout);
+
+      searchTimeout = setTimeout(async () => {
+        try {
+          if (!window.google || !window.google.maps) {
+            await loadGoogleMaps();
+          }
+
+          if (!autocompleteService) {
+            autocompleteService = new google.maps.places.AutocompleteService();
+          }
+
+          autocompleteService.getPlacePredictions(
+            { input: q, language: 'zh-TW' },
+            (predictions, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                searchResults.value = predictions;
+              } else {
+                searchResults.value = [];
+              }
+              isSearching.value = false;
+            }
+          );
+        } catch (err) {
+          console.error(err);
+          searchResults.value = [];
+          isSearching.value = false;
+        }
+      }, 300);
+    };
+
+    const useCoordinateInput = () => {
+      if (resolvedCoordName.value) newPlace.value = resolvedCoordName.value;
+      addPlace();
+    };
+
+    const selectPlace = (item) => {
+      newPlace.value = item.structured_formatting.main_text;
+      selectedPlaceData.value = item;
+      searchResults.value = [];
+    };
+
+    const searchInExternalMap = () => {
+      const query = newPlace.value.trim();
+
+      if (isKoreaTrip.value) {
+        window.open(`https://map.naver.com/v5/search/${encodeURIComponent(query)}`, '_blank');
+      } else {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+      }
+
+      searchResults.value = [];
+    };
+
+    const addPlace = async () => {
+      if (isAddingPlace.value) return;
+      if(!currentTrip.value) return;
+
+      const placeName = newPlace.value.trim();
+      if(!placeName) return;
+
+      isAddingPlace.value = true;
+      setTimeout(() => {
+        isAddingPlace.value = false;
+      }, 500);
+      beginLocalWrite();
+
+      const id = generateId();
+      const d = currentDay.value;
+      const selectedPlaceSnapshot = selectedPlaceData.value ? { ...selectedPlaceData.value } : null;
+      const selectedLatSnapshot = selectedLat.value;
+      const selectedLngSnapshot = selectedLng.value;
+      const noteSnapshot = newNote.value || '';
+      const timeSnapshot = newTime.value || '';
+
+      const item = {
+        id,
+        name: placeName,
+        name_ko: '',
+        address: '',
+        day: d,
+        lat: selectedLatSnapshot != null ? selectedLatSnapshot : null,
+        lng: selectedLngSnapshot != null ? selectedLngSnapshot : null,
+        place_id: selectedPlaceSnapshot?.place_id || '',
+        message: noteSnapshot,
+        time: timeSnapshot,
+        trip_id: currentTrip.value.id
+      };
+
+      const oldIds = getOrderIds(currentTrip.value.id, d).filter(x => String(x) !== String(id));
+      const ids = oldIds.slice();
+      ids.push(String(id));
+
+      itinerary.value.push(item);
+      setOrderIds(currentTrip.value.id, d, ids);
+
+      newPlace.value = '';
+      newNote.value = '';
+      newTime.value = '';
+      selectedPlaceData.value = null;
+      searchResults.value = [];
+      selectedLat.value = null;
+      selectedLng.value = null;
+      isCoordinateMode.value = false;
+      resolvedCoordName.value = '';
+
+      await nextTick();
+      scheduleSortableInit();
+      updateMapMarkers();
+      scheduleTripCacheSave();
+
+      try {
+        let lat = item.lat;
+        let lng = item.lng;
+        let placeId = item.place_id || '';
+        let displayName = placeName;
+        let nameKo = '';
+        let address = '';
+
+        if (selectedPlaceSnapshot?.place_id) {
+          placeId = selectedPlaceSnapshot.place_id;
+
+          const normalPlace = await getPlaceDetails(placeId, 'zh-TW');
+          if (normalPlace) {
+            displayName = normalPlace.name || placeName;
+            address = normalPlace.formatted_address || '';
+            if (normalPlace.geometry?.location) {
+              lat = normalPlace.geometry.location.lat();
+              lng = normalPlace.geometry.location.lng();
+            }
+          }
+
+          if (isKoreaTrip.value) {
+            const koPlace = await getPlaceDetails(placeId, 'ko');
+            if (koPlace) {
+              nameKo = koPlace.name || '';
+              if (!address) address = koPlace.formatted_address || '';
+              if ((lat == null || lng == null) && koPlace.geometry?.location) {
+                lat = koPlace.geometry.location.lat();
+                lng = koPlace.geometry.location.lng();
+              }
+            }
+          }
+        } else if (selectedLatSnapshot != null && selectedLngSnapshot != null) {
+          lat = selectedLatSnapshot;
+          lng = selectedLngSnapshot;
+          placeId = '';
+        } else if (window.google) {
+          const geocoder = new google.maps.Geocoder();
+          await new Promise((resolve) => {
+            geocoder.geocode(
+              { address: placeName + (currentTrip.value.city ? " " + currentTrip.value.city : "") },
+              (results, status) => {
+                if (status === 'OK' && results && results[0]) {
+                  lat = results[0].geometry.location.lat();
+                  lng = results[0].geometry.location.lng();
+                  placeId = results[0].place_id || '';
+                  address = results[0].formatted_address || '';
+                }
+                resolve();
+              }
+            );
+          });
+        }
+
+        const updatedItem = {
+          id,
+          name: displayName || placeName,
+          name_ko: nameKo || '',
+          address: address || '',
+          day: d,
+          lat,
+          lng,
+          place_id: placeId,
+          message: noteSnapshot,
+          time: timeSnapshot,
+          trip_id: currentTrip.value.id,
+          order: item.order
+        };
+
+        const idx = itinerary.value.findIndex(x => String(x.id) === String(id));
+        if (idx !== -1) {
+          itinerary.value.splice(idx, 1, updatedItem);
+        }
+
+        const res = await postJSON({ action:'add', type:'itinerary', data: updatedItem });
+        if (res && res.status === 'error') {
+          throw new Error(res.message || 'add itinerary failed');
+        }
+
+        await saveOrderToDB(currentTrip.value.id, d, ids);
+        updateMapMarkers();
+        scheduleTripCacheSave();
+      } catch (err) {
+        console.error('addPlace sync failed:', err);
+
+        const idx = itinerary.value.findIndex(x => String(x.id) === String(id));
+        if (idx !== -1) itinerary.value.splice(idx, 1);
+
+        const rollbackIds = getOrderIds(currentTrip.value.id, d).filter(x => String(x) !== String(id));
+        setOrderIds(currentTrip.value.id, d, rollbackIds);
+        try { await saveOrderToDB(currentTrip.value.id, d, rollbackIds); } catch(e) {}
+
+        await nextTick();
+        scheduleSortableInit();
+        updateMapMarkers();
+        scheduleTripCacheSave();
+
+        alert('行程新增失敗，已取消剛剛新增的資料，請稍後再試。');
+      } finally {
+        endLocalWrite();
+      }
+    };
+
+    const removePlace = async (id) => {
+      if (!confirm('確定刪除此行程？')) return;
+
+      const i = itinerary.value.findIndex(x => String(x.id) === String(id));
+      const removedDay = i !== -1 ? (itinerary.value[i].day ? parseInt(itinerary.value[i].day,10) : 1) : currentDay.value;
+      if(i !== -1) itinerary.value.splice(i, 1);
+
+      await postJSON({ action:'del', type:'itinerary', id });
+
+      const ids = getOrderIds(currentTrip.value.id, removedDay).filter(x => String(x) !== String(id));
+      setOrderIds(currentTrip.value.id, removedDay, ids);
+      try { await saveOrderToDB(currentTrip.value.id, removedDay, ids); } catch(e){}
+
+      await nextTick();
+      scheduleSortableInit();
+      updateMapMarkers();
+    };
+
+    const openExternalMap = (p) => {
+      if (isKoreaTrip.value) {
+        const displayName = encodeURIComponent(p.name_ko || p.name || '');
+        const searchName = encodeURIComponent(p.name_ko || p.name || '');
+        const lat = p.lat;
+        const lng = p.lng;
+
+        if (lat && lng) {
+          const naverAppLink = `nmap://place?lat=${lat}&lng=${lng}&name=${displayName}&appname=tripplanner`;
+          const naverWebSearch = `https://map.naver.com/v5/search/${searchName}`;
+
+          window.location.href = naverAppLink;
+
+          setTimeout(() => {
+            window.open(naverWebSearch, "_blank");
+          }, 1200);
+
+          return;
+        }
+
+        window.open(`https://map.naver.com/v5/search/${searchName}`, '_blank');
+        return;
+      }
+
+      if (p.place_id) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}&query_place_id=${p.place_id}`, '_blank');
+        return;
+      }
+      if (p.lat && p.lng) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`, '_blank');
+        return;
+      }
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.name||'') + ' ' + (currentTrip.value?.city||''))}`, '_blank');
+    };
+
+    const openEditModal = (p) => {
+      if (!p || !p.id) return;
+      editPlaceId.value = String(p.id);
+      editPlace.value = {
+        name: String(p.name || ''),
+        time: formatTime(p.time || ''),
+        message: String(p.message || ''),
+        day: p.day ? parseInt(p.day, 10) : 1
+      };
+      showEditModal.value = true;
+    };
+
+    const closeEditModal = () => {
+      showEditModal.value = false;
+    };
+
+    const saveEditPlace = async () => {
+      if (!currentTrip.value) return;
+      const id = editPlaceId.value;
+      if (!id) return;
+
+      const idx = itinerary.value.findIndex(x => String(x.id) === String(id));
+      if (idx < 0) {
+        showEditModal.value = false;
+        return;
+      }
+
+      const newDay = editPlace.value.day ? parseInt(editPlace.value.day, 10) : 1;
+      const oldDay = itinerary.value[idx].day ? parseInt(itinerary.value[idx].day, 10) : 1;
+
+      itinerary.value[idx].name = editPlace.value.name || '';
+      itinerary.value[idx].time = editPlace.value.time || '';
+      itinerary.value[idx].message = editPlace.value.message || '';
+      itinerary.value[idx].day = newDay;
+      if (oldDay !== newDay) itinerary.value[idx].order = null;
+
+      isLoading.value = true;
+      try {
+        await postJSON({
+          action: 'edit',
+          type: 'itinerary',
+          data: {
+            id,
+            trip_id: currentTrip.value.id,
+            name: itinerary.value[idx].name,
+            time: itinerary.value[idx].time,
+            message: itinerary.value[idx].message,
+            day: newDay
+          }
+        });
+
+        if (oldDay !== newDay) {
+          const oldIds = getOrderIds(currentTrip.value.id, oldDay).filter(x => String(x) !== String(id));
+          setOrderIds(currentTrip.value.id, oldDay, oldIds);
+          try { await saveOrderToDB(currentTrip.value.id, oldDay, oldIds); } catch(e) {}
+
+          const newIds = getOrderIds(currentTrip.value.id, newDay).filter(x => String(x) !== String(id));
+          newIds.push(String(id));
+          setOrderIds(currentTrip.value.id, newDay, newIds);
+          try { await saveOrderToDB(currentTrip.value.id, newDay, newIds); } catch(e) {}
+
+          currentDay.value = newDay;
+        }
+
+        await nextTick();
+        scheduleSortableInit();
+        updateMapMarkers();
+      } finally {
+        isLoading.value = false;
+        showEditModal.value = false;
+      }
+    };
+
+    const normalExpenseRecords = computed(() => {
+      return expenses.value
+        .filter(e => !isPublicAccountFund(e))
+        .slice()
+        .sort((a, b) => expenseCreatedTime(b) - expenseCreatedTime(a));
+    });
+
+    const hasExpenseFilters = computed(() =>
+      expenseFilter.value.day !== 'all' ||
+      expenseFilter.value.category !== 'all' ||
+      expenseFilter.value.payer !== 'all'
+    );
+
+    const moneyDays = computed(() => {
+      const set = new Set();
+      for (let d = 1; d <= totalDays.value; d++) set.add(d);
+      normalExpenseRecords.value.forEach(e => set.add(e.day ? parseInt(e.day, 10) || 1 : 1));
+      return Array.from(set).sort((a, b) => a - b);
+    });
+
+    const filteredExpenses = computed(() => {
+      return normalExpenseRecords.value.filter(e => {
+        const dayOk = expenseFilter.value.day === 'all' || String(e.day || 1) === String(expenseFilter.value.day);
+        const catOk = expenseFilter.value.category === 'all' || (e.category || '其他') === expenseFilter.value.category;
+        const payerOk = expenseFilter.value.payer === 'all' || e.payer === expenseFilter.value.payer;
+        return dayOk && catOk && payerOk;
+      });
+    });
+
+    const filteredExpenseTotal = computed(() => filteredExpenses.value.reduce((sum, e) => sum + (Number(e.amount) || 0), 0));
+
+    const filteredCategoryAnalysis = computed(() => {
+      const stats = {};
+      filteredExpenses.value.forEach(e => {
+        const cat = e.category || '未分類';
+        stats[cat] = (stats[cat] || 0) + (Number(e.amount) || 0);
+      });
+      return Object.entries(stats).map(([name, total]) => ({ name, total })).sort((a, b) => b.total - a.total);
+    });
+
+    const filteredDayExpenseAnalysis = computed(() => {
+      const stats = {};
+      filteredExpenses.value.forEach(e => {
+        const day = e.day ? parseInt(e.day, 10) || 1 : 1;
+        stats[day] = (stats[day] || 0) + (Number(e.amount) || 0);
+      });
+      return Object.entries(stats).map(([day, total]) => ({ day: Number(day), total })).sort((a, b) => a.day - b.day);
+    });
+
+    const filteredPayerExpenseAnalysis = computed(() => {
+      const stats = {};
+      filteredExpenses.value.forEach(e => {
+        const payer = e.payer || '未指定';
+        stats[payer] = (stats[payer] || 0) + (Number(e.amount) || 0);
+      });
+      return Object.entries(stats).map(([name, total]) => ({ name, total })).sort((a, b) => b.total - a.total);
+    });
+
+
+    const clearHotelSearchDropdown = () => {
+      hotelSearchResults.value = [];
+      hotelIsSearching.value = false;
+    };
+
+    const searchHotelPlacesInput = async () => {
+      const q = hotelSearchQuery.value.trim();
+
+      if (!q) {
+        clearHotelSearchDropdown();
+        hotelSelectedPlaceData.value = null;
+        return;
+      }
+
+      hotelIsSearching.value = true;
+      if (hotelSearchTimeout) clearTimeout(hotelSearchTimeout);
+
+      hotelSearchTimeout = setTimeout(async () => {
+        try {
+          if (!window.google || !window.google.maps) {
+            await loadGoogleMaps();
+          }
+
+          if (!autocompleteService) {
+            autocompleteService = new google.maps.places.AutocompleteService();
+          }
+
+          autocompleteService.getPlacePredictions(
+            {
+              input: q,
+              language: 'zh-TW',
+              types: ['establishment']
+            },
+            (predictions, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                hotelSearchResults.value = predictions;
+              } else {
+                hotelSearchResults.value = [];
+              }
+              hotelIsSearching.value = false;
+            }
+          );
+        } catch (err) {
+          console.error(err);
+          hotelSearchResults.value = [];
+          hotelIsSearching.value = false;
+        }
+      }, 300);
+    };
+
+    const selectHotelPlace = (item) => {
+      hotelSearchQuery.value = item.structured_formatting?.main_text || '';
+      hotelSelectedPlaceData.value = item;
+      clearHotelSearchDropdown();
+    };
+
+    const addHotel = async () => {
+      if (isAddingHotel.value) return;
+      if (!currentTrip.value?.id) return;
+
+      const startDay = parseInt(newHotel.value.start_day, 10) || 1;
+      const endDay = parseInt(newHotel.value.end_day, 10) || startDay;
+      const safeStart = Math.min(startDay, endDay);
+      const safeEnd = Math.max(startDay, endDay);
+      const keyword = hotelSearchQuery.value.trim();
+
+      if (!keyword && !hotelSelectedPlaceData.value?.place_id) {
+        alert('請先搜尋並選擇住宿地點');
+        return;
+      }
+
+      if (hasHotelOverlap(safeStart, safeEnd)) {
+        alert('住宿區間與既有住宿重疊，請調整 Day 起迄');
+        return;
+      }
+
+      isAddingHotel.value = true;
+
+      try {
+        let placeId = hotelSelectedPlaceData.value?.place_id || '';
+        let displayName = keyword;
+        let address = '';
+        let lat = null;
+        let lng = null;
+
+        if (placeId) {
+          const place = await getPlaceDetails(placeId, 'zh-TW');
+          if (place) {
+            displayName = place.name || displayName;
+            address = place.formatted_address || '';
+            if (place.geometry?.location) {
+              lat = place.geometry.location.lat();
+              lng = place.geometry.location.lng();
+            }
+          }
+        }
+
+        if ((lat == null || lng == null) && window.google && keyword) {
+          const geocoder = new google.maps.Geocoder();
+          await new Promise((resolve) => {
+            geocoder.geocode(
+              { address: keyword + (currentTrip.value?.city ? ' ' + currentTrip.value.city : '') },
+              (results, status) => {
+                if (status === 'OK' && results && results[0]) {
+                  displayName = results[0].name || displayName;
+                  address = results[0].formatted_address || address;
+                  lat = results[0].geometry.location.lat();
+                  lng = results[0].geometry.location.lng();
+                  placeId = results[0].place_id || placeId;
+                }
+                resolve();
+              }
+            );
+          });
+        }
+
+        if (lat == null || lng == null) {
+          alert('找不到住宿座標，請重新選擇地點');
+          return;
+        }
+
+        const item = normalizeHotelRecord({
+          id: generateId(),
+          trip_id: currentTrip.value.id,
+          name: displayName || keyword || '住宿',
+          start_day: safeStart,
+          end_day: safeEnd,
+          lat,
+          lng,
+          place_id: placeId,
+          address,
+          note: ''
+        });
+
+        const res = await postJSON({ action: 'add', type: 'hotels', data: item });
+        if (res && res.status === 'error') {
+          console.error('add hotel failed:', res.message || res);
+          alert('住宿新增失敗，請確認後端已加入 hotels 支援');
+          return;
+        }
+
+        hotels.value.push(item);
+        hotelSearchQuery.value = '';
+        hotelSelectedPlaceData.value = null;
+        newHotel.value = { start_day: safeEnd < totalDays.value ? safeEnd + 1 : safeStart, end_day: safeEnd < totalDays.value ? safeEnd + 1 : safeEnd };
+        clearHotelSearchDropdown();
+        scheduleTripCacheSave();
+        updateMapMarkers();
+      } catch (err) {
+        console.error('addHotel error:', err);
+        alert('住宿新增失敗，請稍後再試');
+      } finally {
+        isAddingHotel.value = false;
+      }
+    };
+
+    const removeHotel = async (id) => {
+      if (isDeletingHotel.value) return;
+      const idx = hotels.value.findIndex(h => String(h.id) === String(id));
+      const item = idx >= 0 ? hotels.value[idx] : null;
+      if (!item?.id) return;
+      if (!confirm('確定刪除此住宿設定？')) return;
+
+      isDeletingHotel.value = true;
+      try {
+        const res = await postJSON({ action: 'del', type: 'hotels', id: item.id });
+        if (res && res.status === 'error') {
+          console.error('delete hotel failed:', res.message || res);
+          alert('住宿刪除失敗，請稍後再試');
+          return;
+        }
+        hotels.value.splice(idx, 1);
+        scheduleTripCacheSave();
+        updateMapMarkers();
+      } finally {
+        isDeletingHotel.value = false;
+      }
+    };
+
+    const addExpense = async () => {
+      if (isAddingExpense.value) return;
+
+      const title = String(newExpense.value.title || '').trim();
+      const amount = Number(newExpense.value.amount || 0);
+
+      if (!title || amount <= 0) return;
+      if (!currentTrip.value?.id) return;
+
+      isAddingExpense.value = true;
+      setTimeout(() => {
+        isAddingExpense.value = false;
+      }, 500);
+      beginLocalWrite();
+
+      const uid = generateId();
+      const d = normalizeExpenseRecord({
+        id: uid,
+        ...newExpense.value,
+        title,
+        amount,
+        day: newExpense.value.day || currentDay.value || 1,
+        involved: [...newExpense.value.involved],
+        trip_id: currentTrip.value.id
+      });
+
+      // 前端先立即顯示，後端在背景慢慢寫入。
+      expenses.value.unshift(d);
+      scheduleTripCacheSave();
+
+      newExpense.value = {
+        title: '',
+        amount: '',
+        payer: people.value[0]?.name || '',
+        involved: people.value.map(p => p.name),
+        category: '飲食',
+        day: currentDay.value || 1
+      };
+
+      try {
+        const res = await postJSON({
+          action: 'add',
+          type: 'expenses',
+          data: {
+            ...d,
+            involved: d.involved.join(',')
+          }
+        });
+
+        if (res && res.status === 'error') {
+          throw new Error(res.message || 'add expense failed');
+        }
+      } catch (err) {
+        console.error('addExpense sync failed:', err);
+
+        const idx = expenses.value.findIndex(x => String(x.id) === String(uid));
+        if (idx !== -1) {
+          expenses.value.splice(idx, 1);
+          scheduleTripCacheSave();
+        }
+
+        alert('記帳寫入失敗，已取消剛剛新增的資料，請稍後再試。');
+      } finally {
+        endLocalWrite();
+      }
+    };
+
+    const openEditExpenseModal = (exp) => {
+      if (!exp || !exp.id) return;
+
+      editExpenseId.value = String(exp.id);
+      editExpense.value = {
+        title: String(exp.title || ''),
+        amount: Number(exp.amount) || '',
+        payer: String(exp.payer || ''),
+        involved: normalizeInvolved(exp.involved),
+        category: exp.category || '飲食',
+        day: exp.day ? parseInt(exp.day, 10) || 1 : 1
+      };
+      showEditExpenseModal.value = true;
+    };
+
+    const closeEditExpenseModal = () => {
+      if (isSavingExpense.value) return;
+      showEditExpenseModal.value = false;
+    };
+
+    const saveEditExpense = async () => {
+      if (isSavingExpense.value) return;
+      if (!currentTrip.value?.id) return;
+
+      const id = editExpenseId.value;
+      if (!id) return;
+
+      const idx = expenses.value.findIndex(x => String(x.id) === String(id));
+      if (idx < 0) {
+        showEditExpenseModal.value = false;
+        return;
+      }
+
+      const title = String(editExpense.value.title || '').trim();
+      const amount = Number(editExpense.value.amount || 0);
+      if (!title || amount <= 0) return;
+
+      isSavingExpense.value = true;
+
+      try {
+        const updated = normalizeExpenseRecord({
+          ...expenses.value[idx],
+          ...editExpense.value,
+          id,
+          title,
+          amount,
+          day: editExpense.value.day || 1,
+          involved: normalizeInvolved(editExpense.value.involved),
+          trip_id: currentTrip.value.id
+        });
+
+        const res = await postJSON({
+          action: 'edit',
+          type: 'expenses',
+          data: {
+            ...updated,
+            involved: updated.involved.join(',')
+          }
+        });
+
+        if (res && res.status === 'error') {
+          console.error('edit expense failed:', res.message || res);
+          alert('記帳修改失敗，請稍後再試');
+          return;
+        }
+
+        expenses.value.splice(idx, 1, updated);
+        scheduleTripCacheSave();
+        showEditExpenseModal.value = false;
+      } catch (err) {
+        console.error('saveEditExpense error:', err);
+        alert('記帳修改失敗，請稍後再試');
+      } finally {
+        isSavingExpense.value = false;
+      }
+    };
+
+    const removeExpense = async (expenseRef) => {
+      let idx = -1;
+      if (typeof expenseRef === 'number') {
+        idx = expenseRef;
+      } else {
+        idx = expenses.value.findIndex(item => String(item.id) === String(expenseRef));
+      }
+      const item = idx >= 0 ? expenses.value[idx] : null;
+      if (!item?.id) return;
+      if (!confirm('確定刪除此筆記帳？')) return;
+      expenses.value.splice(idx, 1);
+      await postJSON({ action:'del', type:'expenses', id: item.id });
+    };
+
+    const addPerson = async () => {
+      const name = newPerson.value.trim();
+      if (!name) return;
+      const uid = generateId();
+      people.value.push({ id: uid, name, trip_id: currentTrip.value.id });
+      if (!newExpense.value.involved.includes(name)) newExpense.value.involved.push(name);
+      if (!newExpense.value.payer) newExpense.value.payer = name;
+      newPerson.value = '';
+      await postJSON({ action:'add', type:'people', data: { id: uid, name, trip_id: currentTrip.value.id } });
+    };
+
+    const removePerson = async (idx) => {
+      const item = people.value[idx];
+      if (!item?.id || !confirm('確定移除此成員？')) return;
+      people.value.splice(idx, 1);
+      await postJSON({ action:'del', type:'people', id: item.id });
+    };
+
+    const totalExpense = computed(() => normalExpenseRecords.value.reduce((s,i) => s + (Number(i.amount) || 0), 0));
+
+    const balanceSheet = computed(() => {
+      if(!people.value.length) return [];
+      let b = {};
+      people.value.forEach(p => b[p.name] = 0);
+
+      expenses.value.forEach(e => {
+        const amt = Number(e.amount) || 0;
+        if(b[e.payer] === undefined) return;
+
+        b[e.payer] += amt;
+        const inv = normalizeInvolved(e.involved);
+        const targets = inv.length ? inv : people.value.map(p => p.name);
+        const v = targets.filter(n => b[n] !== undefined);
+
+        if(v.length) {
+          const share = amt / v.length;
+          v.forEach(n => b[n] -= share);
+        }
+      });
+
+      return Object.keys(b).map(n => ({name:n, balance:b[n]}));
+    });
+
+    const categoryAnalysis = computed(() => {
+      const stats = {};
+      normalExpenseRecords.value.forEach(e => {
+        const cat = e.category || '未分類';
+        stats[cat] = (stats[cat] || 0) + (Number(e.amount) || 0);
+      });
+      return Object.entries(stats).map(([name, total]) => ({name, total})).sort((a,b) => b.total - a.total);
+    });
+
+    const buildItineraryText = () => {
+      if(!currentTrip.value) return '';
+
+      let text = `【${currentTrip.value.name}】行程表\n\n`;
+      for(let d = 1; d <= totalDays.value; d++) {
+        text += `📅 Day ${d}`;
+        const label = dayLabel(d);
+        if (label) text += ` | ${label}`;
+        text += `\n`;
+        const dayItems = getDayOrderedItems(d);
+
+        if(dayItems.length === 0) {
+          text += "  (無行程)\n\n";
+          continue;
+        }
+
+        dayItems.forEach(item => {
+          const msg = item.message ? ` (${String(item.message).replace(/\n/g, ' ')})` : '';
+          text += `  ${formatTime(item.time) ? formatTime(item.time)+' ' : ''}${item.name}${msg}\n`;
+        });
+        text += "\n";
+      }
+
+      return text;
+    };
+
+    const exportItinerary = () => {
+      const text = buildItineraryText();
+      if (!text) return;
+      navigator.clipboard.writeText(text);
+      alert('已複製到剪貼簿');
+    };
+
+    const downloadItineraryTxt = () => {
+      const text = buildItineraryText();
+      if (!text) return;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      const safeName = String(currentTrip.value?.name || 'itinerary').replace(/[\\/:*?"<>|]+/g, '_');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${safeName}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 500);
+    };
+
+    const switchTab = async (tab) => {
+      currentTab.value = tab;
+      await nextTick();
+
+      if (tab === 'map') {
+        await loadGoogleMaps();
+        initGoogleMap();
+
+        setTimeout(() => {
+          if (mapInstance && window.google) {
+            google.maps.event.trigger(mapInstance, 'resize');
+            updateMapMarkers();
+          }
+        }, 100);
+      }
+
+      scheduleSortableInit();
+    };
+
+    watch(currentDay, () => {
+      clearRouteResults();
+      mapAddDay.value = currentDay.value || 1;
+      newExpense.value.day = currentDay.value || 1;
+      if (getMapDisplayDay()) {
+        mapDisplayFilter.value = `day-${currentDay.value || 1}`;
+      }
+      scheduleSortableInit();
+      if (currentTab.value === 'map') updateMapMarkers();
+    });
+
+    watch(routeTravelMode, () => clearRouteResults());
+
+    watch(currentTab, () => {
+      scheduleSortableInit();
+      if (currentTab.value === 'map') {
+        setTimeout(() => updateMapMarkers(), 80);
+      }
+    });
+
+    watch(currentView, () => scheduleSortableInit());
+    watch(mapSearchQuery, (val) => {
+      if (!String(val || '').trim()) {
+        clearMapSearchResult();
+      }
+    });
+    watch([itinerary, expenses, people, hotels], () => scheduleTripCacheSave(), { deep: true });
+    watch(currentTrip, () => scheduleTripCacheSave(), { deep: true });
+    watch(trips, () => scheduleTripsCacheSave(), { deep: true });
+
+    onMounted(async () => {
+      const hasTripsCache = loadTripsCache();
+      console.log('loadTripsCache =', hasTripsCache);
+      fetchTrips();
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    });
+
+    onBeforeUnmount(() => {
+      stopAutoSync();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    });
+
+    return {
+      currentView, currentTrip, trips, newTripName, newTripCity,
+      currentTab, isLoading, isAutoSyncing, isAddingPlace, isAddingMapPlace, isAddingExpense, isSavingExpense,
+      routeTravelMode, routeSegments, routeTotalText, isRouteLoading, routeError, testDayRoutes, clearRouteResults,
+      currentDay, totalDays,
+      people, itinerary, expenses, hotels, filteredItinerary,
+      newPlace, newTime, newNote, newPerson, newExpense, expenseFilter, categories,
+      searchResults, isSearching, isCoordinateMode, resolvedCoordName,
+      mapSearchQuery, mapSearchResults, mapIsSearching, mapIsCoordinateMode, mapResolvedCoordName, isMapReady,
+      mapLatestResult, mapAddDay, mapDisplayFilter,
+      newHotel, hotelSearchQuery, hotelSearchResults, hotelIsSearching, isAddingHotel, isDeletingHotel,
+
+      createTrip, selectTrip, exitTrip, deleteTripTotally, fetchData, manualSync,
+
+      switchTab, addNewDay, deleteDay, onDayClick, onDayDblClick, dayLabel,
+
+      showDayModal, modalDay, dateInput, swapTargetDay, closeDayModal, applyDay1Date, swapWithDay,
+
+      searchPlacesInput, useCoordinateInput, selectPlace, searchInExternalMap,
+      addPlace, removePlace, openExternalMap, handleItineraryContentClick, linkifyMessage,
+      itineraryListEl, formatTime,
+
+      searchMapPlacesInput, useMapCoordinateInput, selectMapPlace, searchMapInExternalMap,
+      searchCityAndJump, fitBoundsToTrip, applyMapDisplayFilter, addMapSearchResultToItinerary,
+      searchHotelPlacesInput, selectHotelPlace, addHotel, removeHotel, hotelDayRangeLabel, openHotelMap,
+
+      addExpense, removeExpense, openEditExpenseModal, closeEditExpenseModal, saveEditExpense, addPerson, removePerson,
+      totalExpense, balanceSheet, categoryAnalysis, formatInvolved,
+      filteredExpenses, filteredExpenseTotal, filteredCategoryAnalysis,
+      filteredDayExpenseAnalysis, filteredPayerExpenseAnalysis, moneyDays, hasExpenseFilters,
+
+      exportItinerary, isKoreaTrip,
+
+      showEditModal, editPlace,
+      openEditModal, closeEditModal, saveEditPlace,
+      showEditExpenseModal, editExpense,
+      openEditExpenseModal, closeEditExpenseModal, saveEditExpense
+    };
+  }
+}).mount('#app');
 </script>
+
 </body>
 </html>
-
